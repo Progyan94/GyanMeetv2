@@ -2,8 +2,7 @@ import { useState } from 'react';
 import {
   VideoConference,
   useLocalParticipant,
-  useDataChannel,
-  Chat
+  useDataChannel
 } from '@livekit/components-react';
 import { Hand } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -83,11 +82,6 @@ export default function ClassUI() {
           </button>
         </div>
 
-      </div>
-
-      {/* Chat Sidebar */}
-      <div style={{ width: '350px', borderLeft: '1px solid var(--glass-border)', background: 'var(--bg-panel)' }}>
-        <Chat />
       </div>
     </div>
   );
