@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&display=swap');
+
+:root {
+  --saffron: #F4C430;
+  --saffron-dark: #D4A017;
+  --saffron-neon: #FFCC00;
+  
+  --accent-green: #39FF14;
+  --accent-green-dark: #2BB310;
+  
+  --bg-dark: #121212;
+  --bg-darker: #050505;
+  --bg-panel: #1a1a1a;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  
+  --border-solid: #333333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-in-out;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--saffron);
+  color: var(--bg-darker);
+  border: 2px solid var(--saffron);
+}
+
+.btn-primary:hover {
+  background-color: var(--saffron-neon);
+  border-color: var(--saffron-neon);
+  box-shadow: 0 0 10px var(--saffron-neon);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+  transform: translateY(-2px);
+}
+
+.btn-glass {
+  background: var(--bg-panel);
+  border: 2px solid var(--border-solid);
+  color: var(--text-primary);
+}
+
+.btn-glass:hover {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  box-shadow: 0 0 10px var(--accent-green);
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input-field {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-darker);
+  border: 2px solid var(--border-solid);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 5px var(--accent-green);
+}
+
+/* Cards & Panels */
+.card {
+  background-color: var(--bg-panel);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 2px solid var(--border-solid);
+}
+
+/* Auth Layout */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: var(--bg-dark);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Brand */
+.brand-title {
+  color: var(--saffron);
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 800;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Meeting Specific Overrides for LiveKit */
+.lk-room-container {
+  background-color: var(--bg-darker) !important;
+}
+
+.lk-grid-layout {
+  /* Force the grid to never overflow, adjusting tiles to fit */
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.lk-participant-tile {
+  /* Allow tiles to get smaller if needed */
+  min-height: 100px !important;
+  min-width: 150px !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-panel);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--saffron);
+}
