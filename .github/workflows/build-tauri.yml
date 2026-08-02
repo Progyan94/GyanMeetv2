@@ -1,0 +1,39 @@
+name: "Release Desktop App"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: ./frontend
+          tagName: GyanMeet-v1.0.${{ github.run_number }}
+          releaseName: "GyanMeet Windows Installer (v1.0.${{ github.run_number }})"
+          releaseBody: "Download the attached .exe or .msi file to install GyanMeet on your Windows PC!"
+          releaseDraft: false
+          prerelease: false
