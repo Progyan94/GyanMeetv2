@@ -16,7 +16,6 @@ import {
   useRoomContext,
   usePinnedTracks,
   Chat,
-  VideoTrack,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { BackgroundBlur, VirtualBackground } from '@livekit/track-processors';
