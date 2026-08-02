@@ -1,40 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Auth from './pages/Auth';
-import Dashboard from './pages/Dashboard';
-import MeetingRoom from './pages/MeetingRoom';
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { currentUser } = useAuth();
-  if (!currentUser) return <Navigate to="/" />;
-  return <>{children}</>;
-};
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Room from './pages/Room';
+import { auth } from './firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function App() {
+  const [user, loading] = useAuthState(auth);
+
+  if (loading) {
+    return <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', color: 'var(--primary-saffron)' }}>Loading...</div>;
+  }
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Auth />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/class/:classCode" 
-            element={
-              <ProtectedRoute>
-                <MeetingRoom />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
+        <Route path="/" element={user ? <Room /> : <Navigate to="/login" />} />
+        <Route path="/room/:id" element={user ? <Room /> : <Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
 }
 

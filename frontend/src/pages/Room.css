@@ -1,0 +1,61 @@
+.room-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: #111;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.join-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--bg-color) 0%, var(--primary-saffron-light) 100%);
+}
+
+.join-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header-logout {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.header-logout:hover {
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Customize LiveKit components to Saffron theme */
+.lk-button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.lk-button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+.lk-button[data-lk-active="true"] {
+  background-color: var(--primary-saffron) !important;
+  color: white !important;
+}
+.lk-control-bar {
+  background-color: rgba(0,0,0,0.8) !important;
+  border-top: 1px solid rgba(255, 153, 51, 0.2);
+}

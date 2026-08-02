@@ -1,0 +1,16 @@
+{
+  "name": "Gyan Classes",
+  "short_name": "GyanMeet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#FF9933",
+  "description": "Educational Video Conferencing Platform",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
