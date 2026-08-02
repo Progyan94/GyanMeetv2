@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import {
@@ -30,6 +30,7 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
   const participants = useParticipants();
   const [blurEnabled, setBlurEnabled] = useState(false);
   const [bgImageEnabled, setBgImageEnabled] = useState(false);
+  const [bgMenuOpen, setBgMenuOpen] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,17 +63,22 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const imageUrl = URL.createObjectURL(file);
+    await setPresetBackground(imageUrl);
+  };
+
+  const setPresetBackground = async (imageUrl: string) => {
     const cameraTrack = getCameraTrack();
     if (!cameraTrack) {
       alert("Please turn on your camera first.");
       return;
     }
     try {
-      const imageUrl = URL.createObjectURL(file);
       const bg = VirtualBackground(imageUrl);
       await cameraTrack.setProcessor(bg);
       setBgImageEnabled(true);
       setBlurEnabled(false);
+      setBgMenuOpen(false);
     } catch (e) {
       console.error("Failed to set virtual background", e);
     }
@@ -188,20 +194,58 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
         {handRaised ? 'Lower Hand' : 'Raise Hand ✋'}
       </button>
       
-      <button className="lk-button" onClick={toggleBlur} title="Toggle Blur" style={{ background: blurEnabled ? 'var(--primary-saffron)' : '' }}>
-        Blur
-      </button>
-
-      <button className="lk-button" onClick={() => fileInputRef.current?.click()} title="Upload Background Image" style={{ background: bgImageEnabled ? 'var(--primary-saffron)' : '' }}>
-        Image BG
-      </button>
-      <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImageUpload} />
-
-      {(blurEnabled || bgImageEnabled) && (
-        <button className="lk-button" onClick={clearProcessors} style={{ background: '#EF4444' }}>
-          Clear BG
+      <div style={{ position: 'relative' }}>
+        <button 
+          className="lk-button" 
+          onClick={() => setBgMenuOpen(!bgMenuOpen)} 
+          style={{ background: (blurEnabled || bgImageEnabled) ? 'var(--primary-saffron)' : '' }}
+        >
+          Backgrounds {bgMenuOpen ? '▼' : '▲'}
         </button>
-      )}
+
+        {bgMenuOpen && (
+          <div style={{
+            position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+            background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+            padding: '10px', borderRadius: '12px', display: 'flex', flexDirection: 'column',
+            gap: '8px', marginBottom: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', minWidth: '150px', zIndex: 100
+          }}>
+            <button className="lk-button" onClick={() => { toggleBlur(); setBgMenuOpen(false); }} style={{ width: '100%' }}>
+              🌫️ Blur Background
+            </button>
+            <button className="lk-button" onClick={() => fileInputRef.current?.click()} style={{ width: '100%' }}>
+              📁 Upload Custom...
+            </button>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginTop: '5px' }}>Presets</div>
+            <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+              <img 
+                src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=100&q=80" 
+                onClick={() => setPresetBackground("https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1280&q=80")}
+                style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }}
+                title="Office"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=100&q=80" 
+                onClick={() => setPresetBackground("https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=1280&q=80")}
+                style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }}
+                title="Gradient"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=100&q=80" 
+                onClick={() => setPresetBackground("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1280&q=80")}
+                style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }}
+                title="Living Room"
+              />
+            </div>
+            {(blurEnabled || bgImageEnabled) && (
+              <button className="lk-button" onClick={() => { clearProcessors(); setBgMenuOpen(false); }} style={{ width: '100%', background: '#EF4444', marginTop: '5px' }}>
+                ❌ Clear Background
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+      <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImageUpload} />
 
       {isTeacher && (
         <>
@@ -222,13 +266,19 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
 function CustomParticipantTile({ participant, ...props }: any) {
   // Read the attributes for hand raised state
   const isHandRaised = participant.attributes?.handRaised === "true";
+  const isDistracted = participant.attributes?.isDistracted === "true";
   
   return (
-    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+    <div style={{ position: 'relative', height: '100%', width: '100%', border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}>
       <ParticipantTile participant={participant} {...props} />
       {isHandRaised && (
         <div style={{ position: 'absolute', top: 10, right: 10, fontSize: '2rem', zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '5px' }}>
           ✋
+        </div>
+      )}
+      {isDistracted && (
+        <div style={{ position: 'absolute', bottom: 10, left: 10, fontSize: '1.5rem', zIndex: 5, background: 'rgba(220, 38, 38, 0.9)', borderRadius: '8px', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px', color: 'white', fontWeight: 'bold' }}>
+          ⚠️ Distracted
         </div>
       )}
     </div>
@@ -237,6 +287,33 @@ function CustomParticipantTile({ participant, ...props }: any) {
 
 function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const [chatOpen, setChatOpen] = useState(false);
+  const { localParticipant } = useLocalParticipant();
+  const participants = useParticipants();
+
+  useEffect(() => {
+    if (isTeacher || !localParticipant) return;
+
+    const handleFocusLoss = () => localParticipant.setAttributes({ isDistracted: "true" });
+    const handleFocusGain = () => localParticipant.setAttributes({ isDistracted: "false" });
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) handleFocusLoss();
+      else if (document.hasFocus()) handleFocusGain();
+    };
+
+    window.addEventListener('blur', handleFocusLoss);
+    window.addEventListener('focus', handleFocusGain);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', handleFocusLoss);
+      window.removeEventListener('focus', handleFocusGain);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isTeacher, localParticipant]);
+
+  const distractedStudents = participants.filter(p => p.attributes?.isDistracted === "true" && p !== localParticipant);
+
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -249,6 +326,25 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
 
   return (
     <div style={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
+      {/* Teacher Distraction Alerts */}
+      {isTeacher && distractedStudents.length > 0 && (
+        <div style={{
+          position: 'absolute', top: 20, right: 20, zIndex: 50,
+          background: 'rgba(220, 38, 38, 0.95)', color: 'white',
+          padding: '15px 20px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+          maxWidth: '300px', backdropFilter: 'blur(10px)', border: '1px solid #FCA5A5'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+            ⚠️ Tab Switched!
+          </h3>
+          <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.95rem' }}>
+            {distractedStudents.map(p => (
+              <li key={p.identity}><strong>{p.name || p.identity}</strong> is not looking at the app.</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Video Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         <div style={{ flex: 1, height: 'calc(100% - 80px)', padding: '10px' }}>
