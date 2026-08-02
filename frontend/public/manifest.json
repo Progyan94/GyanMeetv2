@@ -1,12 +1,12 @@
 {
   "background_color": "#ff4b00",
-  "description": "GyanMeet: Video Conference app for Gyan Classes made by GyanXD25",
+  "description": "GyanMeet",
   "dir": "ltr",
   "display": "standalone",
-  "name": "GyanMeet: Video Conference app for Gyan Classes",
+  "name": "GyanMeet",
   "orientation": "portrait-primary",
   "scope": "/",
-  "short_name": "GyanMeet: Video Conference app for Gyan Classes",
+  "short_name": "GyanMeet",
   "start_url": "/",
   "theme_color": "#00ff9c",
   "icons": [
