@@ -3,8 +3,8 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "https://gyanclasses.vercel.app",
-    "distDir": "https://gyanclasses.vercel.app"
+    "devPath": "https://gyanmeet.vercel.app",
+    "distDir": "https://gyanmeet.vercel.app"
   },
   "package": {
     "productName": "GyanMeet",
