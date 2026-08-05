@@ -1,4 +1,5 @@
 import React from 'react';
+import { Video } from 'lucide-react';
 import './AuthLayout.css';
 
 export default function AuthLayout({ children, title, subtitle }: { children: React.ReactNode, title: string, subtitle: string }) {
@@ -6,13 +7,13 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
     <div className="auth-container">
       <div className="auth-card card">
         <div className="auth-header">
-          <div className="auth-logo">GC</div>
+          <div className="auth-logo"><Video size={36} color="white" /></div>
           <h1>{title}</h1>
           <p className="auth-subtitle">{subtitle}</p>
         </div>
         {children}
         <div className="auth-footer">
-          <p>&copy; {new Date().getFullYear()} Gyan Classes. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} GyanMeet. All rights reserved.</p>
         </div>
       </div>
     </div>
