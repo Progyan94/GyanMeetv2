@@ -570,15 +570,15 @@ export default function Room() {
   const joinMeeting = async (targetRoom: string) => {
     if (!targetRoom.trim()) return;
     
-    // Use the display name from the Firebase profile (set during signup)
-    // Fallback to email handle or "Student" if not set.
     const participantName = user?.displayName || user?.email?.split('@')[0] || 'Student';
 
     setLoading(true);
     setError('');
     
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      // Use the live Vercel backend URL
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
+      
       const response = await fetch(`${backendUrl}/api/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -608,7 +608,6 @@ export default function Room() {
   };
 
   const handleCreateMeeting = () => {
-    // Generate a random class code like "gyan-1234"
     const randomCode = "gyan-" + Math.floor(1000 + Math.random() * 9000);
     setRoomName(randomCode);
     joinMeeting(randomCode);
@@ -660,6 +659,15 @@ export default function Room() {
               {loading ? 'Joining...' : 'Join Existing Class'}
             </button>
           </form>
+          
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              🔄 Check for Updates (Refresh)
+            </button>
+          </div>
         </div>
       </div>
     );
