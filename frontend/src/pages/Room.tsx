@@ -24,6 +24,62 @@ import './Room.css';
 
 const serverUrl = 'wss://gyanmeet-3khfyxf1.livekit.cloud';
 
+// --- IDB Helper for Custom Backgrounds ---
+const DB_NAME = 'GyanMeet_DB';
+const STORE_NAME = 'custom_backgrounds';
+
+const initDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e: any) => {
+      if (!e.target.result.objectStoreNames.contains(STORE_NAME)) {
+        e.target.result.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+const saveBackgroundToDB = async (blob: Blob): Promise<number> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.add({ image: blob, timestamp: Date.now() });
+    request.onsuccess = (e: any) => resolve(e.target.result);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+const loadBackgroundsFromDB = async (): Promise<{id: number, url: string}[]> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const results = request.result.map((item: any) => ({
+        id: item.id,
+        url: URL.createObjectURL(item.image)
+      }));
+      resolve(results);
+    };
+    request.onerror = () => reject(request.error);
+  });
+};
+
+const deleteBackgroundFromDB = async (id: number): Promise<void> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
 function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boolean, chatOpen: boolean, setChatOpen: (v: boolean) => void }) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
@@ -33,6 +89,15 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
   const [bgMenuOpen, setBgMenuOpen] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [customBgs, setCustomBgs] = useState<{id: number, url: string}[]>([]);
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+
+  useEffect(() => {
+    loadBackgroundsFromDB().then(bgs => setCustomBgs(bgs)).catch(console.error);
+  }, []);
 
   const getCameraTrack = () => {
     if (!localParticipant) return null;
@@ -63,8 +128,23 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const imageUrl = URL.createObjectURL(file);
-    await setPresetBackground(imageUrl);
+    try {
+      await saveBackgroundToDB(file);
+      const bgs = await loadBackgroundsFromDB();
+      setCustomBgs(bgs);
+      if (bgs.length > 0) {
+        await setPresetBackground(bgs[bgs.length - 1].url);
+      }
+    } catch(err) {
+      console.error("Failed to save background", err);
+    }
+  };
+
+  const handleRemoveCustomBg = async (id: number, url: string) => {
+    await deleteBackgroundFromDB(id);
+    URL.revokeObjectURL(url);
+    const bgs = await loadBackgroundsFromDB();
+    setCustomBgs(bgs);
   };
 
   const setPresetBackground = async (imageUrl: string) => {
@@ -90,6 +170,77 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
       await cameraTrack.stopProcessor();
       setBlurEnabled(false);
       setBgImageEnabled(false);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      let finalStream = displayStream;
+
+      try {
+        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioContext = new AudioContext();
+        const dest = audioContext.createMediaStreamDestination();
+
+        if (displayStream.getAudioTracks().length > 0) {
+          const displaySource = audioContext.createMediaStreamSource(new MediaStream(displayStream.getAudioTracks()));
+          displaySource.connect(dest);
+        }
+        
+        const micSource = audioContext.createMediaStreamSource(micStream);
+        micSource.connect(dest);
+
+        finalStream = new MediaStream([
+          displayStream.getVideoTracks()[0],
+          dest.stream.getAudioTracks()[0]
+        ]);
+        
+        (finalStream as any)._ctx = audioContext;
+        (finalStream as any)._micTracks = micStream.getTracks();
+      } catch(e) {
+         console.warn("Could not get mic access for recording", e);
+      }
+
+      const recorder = new MediaRecorder(finalStream, { mimeType: 'video/webm' });
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `GyanMeet_Recording_${new Date().getTime()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        recordedChunksRef.current = [];
+        setRecording(false);
+        
+        if ((finalStream as any)._ctx) (finalStream as any)._ctx.close();
+        if ((finalStream as any)._micTracks) (finalStream as any)._micTracks.forEach((t:any) => t.stop());
+      };
+
+      displayStream.getVideoTracks()[0].onended = () => {
+        if (recorder.state !== 'inactive') recorder.stop();
+        finalStream.getTracks().forEach(t => t.stop());
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setRecording(true);
+    } catch (err: any) {
+      console.error("Failed to start recording:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
     }
   };
 
@@ -237,6 +388,27 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
                 title="Living Room"
               />
             </div>
+
+            {customBgs.length > 0 && <div style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginTop: '5px' }}>My Backgrounds</div>}
+            {customBgs.length > 0 && (
+              <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {customBgs.map(bg => (
+                  <div key={bg.id} style={{ position: 'relative' }}>
+                    <img 
+                      src={bg.url}
+                      onClick={() => setPresetBackground(bg.url)}
+                      style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }}
+                      title="Custom"
+                    />
+                    <div 
+                      onClick={(e) => { e.stopPropagation(); handleRemoveCustomBg(bg.id, bg.url); }}
+                      style={{ position: 'absolute', top: -5, right: -5, background: 'red', color: 'white', borderRadius: '50%', width: 16, height: 16, fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                    >✕</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             {(blurEnabled || bgImageEnabled) && (
               <button className="lk-button" onClick={() => { clearProcessors(); setBgMenuOpen(false); }} style={{ width: '100%', background: '#EF4444', marginTop: '5px' }}>
                 ❌ Clear Background
@@ -255,6 +427,15 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
           <button className="lk-button" onClick={handleRemove} style={{ background: '#DC2626' }}>
             Remove Student
           </button>
+          {recording ? (
+            <button className="lk-button" onClick={stopRecording} style={{ background: '#DC2626', animation: 'pulse 1.5s infinite' }}>
+              🔴 Stop Recording
+            </button>
+          ) : (
+            <button className="lk-button" onClick={startRecording} style={{ background: '#10B981' }}>
+              ⏺️ Record Meeting
+            </button>
+          )}
         </>
       )}
 
