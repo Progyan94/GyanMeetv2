@@ -14,6 +14,12 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
         {children}
         <div className="auth-footer">
           <p>&copy; {new Date().getFullYear()} GyanMeet. All rights reserved.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            🔄 Check for Updates (Refresh)
+          </button>
         </div>
       </div>
     </div>
