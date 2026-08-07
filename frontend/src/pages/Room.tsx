@@ -24,6 +24,34 @@ import './Room.css';
 
 const serverUrl = 'wss://gyanmeet-3khfyxf1.livekit.cloud';
 
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    this.setState({ errorInfo });
+    console.error("Caught by ErrorBoundary:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', background: '#DC2626', color: 'white', height: '100vh', overflow: 'auto' }}>
+          <h2>Something went wrong in the meeting room UI.</h2>
+          <pre style={{ background: 'rgba(0,0,0,0.5)', padding: '10px' }}>{this.state.error?.toString()}</pre>
+          <pre style={{ background: 'rgba(0,0,0,0.5)', padding: '10px' }}>{this.state.errorInfo?.componentStack}</pre>
+          <button onClick={() => window.location.reload()} style={{ padding: '10px', marginTop: '10px', background: 'white', color: 'black' }}>Reload Page</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+
 // --- IDB Helper for Custom Backgrounds ---
 const DB_NAME = 'GyanMeet_DB';
 const STORE_NAME = 'custom_backgrounds';
@@ -699,8 +727,10 @@ export default function Room() {
         style={{ height: '100vh', position: 'relative' }}
         onDisconnected={() => setToken('')}
       >
-        <CustomVideoConference isTeacher={isTeacher} />
-        <RoomAudioRenderer />
+        <ErrorBoundary>
+          <CustomVideoConference isTeacher={isTeacher} />
+          <RoomAudioRenderer />
+        </ErrorBoundary>
       </LiveKitRoom>
     </div>
   );
