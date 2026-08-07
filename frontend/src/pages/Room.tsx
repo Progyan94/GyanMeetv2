@@ -698,7 +698,7 @@ export default function Room() {
           
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <button 
-              onClick={() => window.location.reload()} 
+              onClick={() => window.location.href = window.location.origin + '?t=' + new Date().getTime()} 
               style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', margin: '0 auto', padding: '8px' }}
             >
               <RefreshCw size={16}/> Check for Updates (Refresh)
