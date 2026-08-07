@@ -11,6 +11,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.0",
     "@excalidraw/excalidraw": "^0.18.1",
     "@livekit/components-react": "^2.9.23",
     "@livekit/components-styles": "^1.2.0",
@@ -24,6 +25,8 @@
     "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^7.6.8",
     "@tauri-apps/cli": "^1.6.3",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
