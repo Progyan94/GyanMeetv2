@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import {
   LiveKitRoom,
@@ -370,17 +371,17 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
         Chat
       </button>
 
-      <button className="lk-button" onClick={toggleHandRaise} style={{ background: handRaised ? 'var(--primary-saffron)' : '' }}>
-        {handRaised ? 'Lower Hand' : 'Raise Hand ✋'}
+      <button className="lk-button" onClick={toggleHandRaise} style={{ background: handRaised ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        {handRaised ? <><HandMetal size={16}/> Lower Hand</> : <><Hand size={16}/> Raise Hand</>}
       </button>
       
       <div style={{ position: 'relative' }}>
         <button 
           className="lk-button" 
           onClick={() => setBgMenuOpen(!bgMenuOpen)} 
-          style={{ background: (blurEnabled || bgImageEnabled) ? 'var(--primary-saffron)' : '' }}
+          style={{ background: (blurEnabled || bgImageEnabled) ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}
         >
-          Backgrounds {bgMenuOpen ? '▼' : '▲'}
+          Backgrounds {bgMenuOpen ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
         </button>
 
         {bgMenuOpen && (
@@ -390,11 +391,11 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
             padding: '10px', borderRadius: '12px', display: 'flex', flexDirection: 'column',
             gap: '8px', marginBottom: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', minWidth: '150px', zIndex: 100
           }}>
-            <button className="lk-button" onClick={() => { toggleBlur(); setBgMenuOpen(false); }} style={{ width: '100%' }}>
-              🌫️ Blur Background
+            <button className="lk-button" onClick={() => { toggleBlur(); setBgMenuOpen(false); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+              <ImageOff size={16}/> Blur Background
             </button>
-            <button className="lk-button" onClick={() => fileInputRef.current?.click()} style={{ width: '100%' }}>
-              📁 Upload Custom...
+            <button className="lk-button" onClick={() => fileInputRef.current?.click()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+              <Upload size={16}/> Upload Custom...
             </button>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginTop: '5px' }}>Presets</div>
             <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
@@ -439,8 +440,8 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
             )}
             
             {(blurEnabled || bgImageEnabled) && (
-              <button className="lk-button" onClick={() => { clearProcessors(); setBgMenuOpen(false); }} style={{ width: '100%', background: '#EF4444', marginTop: '5px' }}>
-                ❌ Clear Background
+              <button className="lk-button" onClick={() => { clearProcessors(); setBgMenuOpen(false); }} style={{ width: '100%', background: '#EF4444', marginTop: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                <XCircle size={16}/> Clear Background
               </button>
             )}
           </div>
@@ -450,19 +451,19 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
 
       {isTeacher && (
         <>
-          <button className="lk-button" onClick={handleRename} style={{ background: 'var(--text-sub)' }}>
-            Rename Student
+          <button className="lk-button" onClick={handleRename} style={{ background: 'var(--text-sub)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Edit2 size={16}/> Rename Student
           </button>
-          <button className="lk-button" onClick={handleRemove} style={{ background: '#DC2626' }}>
-            Remove Student
+          <button className="lk-button" onClick={handleRemove} style={{ background: '#DC2626', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <UserX size={16}/> Remove Student
           </button>
           {recording ? (
-            <button className="lk-button" onClick={stopRecording} style={{ background: '#DC2626', animation: 'pulse 1.5s infinite' }}>
-              🔴 Stop Recording
+            <button className="lk-button" onClick={stopRecording} style={{ background: '#DC2626', animation: 'pulse 1.5s infinite', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Square size={16} fill="currentColor"/> Stop Recording
             </button>
           ) : (
-            <button className="lk-button" onClick={startRecording} style={{ background: '#10B981' }}>
-              ⏺️ Record Meeting
+            <button className="lk-button" onClick={startRecording} style={{ background: '#10B981', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Circle size={16} fill="currentColor" color="#DC2626"/> Record Meeting
             </button>
           )}
         </>
@@ -488,13 +489,13 @@ function CustomParticipantTile(props: any) {
     <div style={{ position: 'relative', height: '100%', width: '100%', border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}>
       <ParticipantTile trackReference={trackReference} participant={directParticipant} {...rest} />
       {isHandRaised && (
-        <div style={{ position: 'absolute', top: 10, right: 10, fontSize: '2rem', zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '5px' }}>
-          ✋
+        <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Hand size={24} color="white"/>
         </div>
       )}
       {isDistracted && (
-        <div style={{ position: 'absolute', bottom: 10, left: 10, fontSize: '1.5rem', zIndex: 5, background: 'rgba(220, 38, 38, 0.9)', borderRadius: '8px', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px', color: 'white', fontWeight: 'bold' }}>
-          ⚠️ Distracted
+        <div style={{ position: 'absolute', bottom: 10, left: 10, zIndex: 5, background: 'rgba(220, 38, 38, 0.9)', borderRadius: '8px', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px', color: 'white', fontWeight: 'bold' }}>
+          <AlertTriangle size={18}/> Distracted
         </div>
       )}
     </div>
@@ -551,7 +552,7 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
           maxWidth: '300px', backdropFilter: 'blur(10px)', border: '1px solid #FCA5A5'
         }}>
           <h3 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
-            ⚠️ Tab Switched!
+            <AlertTriangle size={20}/> Tab Switched!
           </h3>
           <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.95rem' }}>
             {distractedStudents.map(p => (
@@ -698,9 +699,9 @@ export default function Room() {
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <button 
               onClick={() => window.location.reload()} 
-              style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', margin: '0 auto', padding: '8px' }}
             >
-              🔄 Check for Updates (Refresh)
+              <RefreshCw size={16}/> Check for Updates (Refresh)
             </button>
           </div>
         </div>
