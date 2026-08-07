@@ -45,7 +45,9 @@ jobs:
 
       - name: Build APK with Gradle
         working-directory: ./frontend/android
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Publish Direct APK Download
         uses: ncipollo/release-action@v1
