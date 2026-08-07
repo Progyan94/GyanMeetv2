@@ -576,8 +576,8 @@ export default function Room() {
     setError('');
     
     try {
-      // Use the live Vercel backend URL
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
+      // Use the same domain for the API call (since the backend is now deployed with the frontend)
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
       
       const response = await fetch(`${backendUrl}/api/token`, {
         method: 'POST',
