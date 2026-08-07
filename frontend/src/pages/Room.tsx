@@ -16,6 +16,7 @@ import {
   useRoomContext,
   usePinnedTracks,
   Chat,
+  LayoutContextProvider,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { BackgroundBlur, VirtualBackground } from '@livekit/track-processors';
@@ -727,10 +728,12 @@ export default function Room() {
         style={{ height: '100vh', position: 'relative' }}
         onDisconnected={() => setToken('')}
       >
-        <ErrorBoundary>
-          <CustomVideoConference isTeacher={isTeacher} />
-          <RoomAudioRenderer />
-        </ErrorBoundary>
+        <LayoutContextProvider>
+          <ErrorBoundary>
+            <CustomVideoConference isTeacher={isTeacher} />
+            <RoomAudioRenderer />
+          </ErrorBoundary>
+        </LayoutContextProvider>
       </LiveKitRoom>
     </div>
   );
