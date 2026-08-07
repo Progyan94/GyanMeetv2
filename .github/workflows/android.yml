@@ -41,7 +41,6 @@ jobs:
       - name: Add Android Platform via Capacitor
         working-directory: ./frontend
         run: |
-          npx cap add android
           npx cap sync android
 
       - name: Build APK with Gradle
