@@ -444,14 +444,20 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
   );
 }
 
-function CustomParticipantTile({ participant, ...props }: any) {
-  // Read the attributes for hand raised state
-  const isHandRaised = participant.attributes?.handRaised === "true";
-  const isDistracted = participant.attributes?.isDistracted === "true";
+function CustomParticipantTile(props: any) {
+  // LiveKit's layout components pass trackReference as a prop
+  const { trackReference, participant: directParticipant, ...rest } = props;
+  
+  // Try to get participant from trackReference, fallback to direct prop (just in case)
+  const participant = trackReference?.participant || directParticipant;
+  
+  // Read the attributes for hand raised state safely
+  const isHandRaised = participant?.attributes?.handRaised === "true";
+  const isDistracted = participant?.attributes?.isDistracted === "true";
   
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%', border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}>
-      <ParticipantTile participant={participant} {...props} />
+      <ParticipantTile trackReference={trackReference} participant={directParticipant} {...rest} />
       {isHandRaised && (
         <div style={{ position: 'absolute', top: 10, right: 10, fontSize: '2rem', zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '5px' }}>
           ✋
