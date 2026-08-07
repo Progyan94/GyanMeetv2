@@ -21,11 +21,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-firebase-hooks": "^5.1.1",
-    "react-router-dom": "^7.18.1",
-    "express": "^5.2.1",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "livekit-server-sdk": "^2.17.0"
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.3",
