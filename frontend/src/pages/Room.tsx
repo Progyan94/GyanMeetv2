@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
 import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX } from 'lucide-react';
 import { signOut } from 'firebase/auth';
+import { RoomEvent, Track, Participant } from 'livekit-client';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -507,6 +508,28 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const [showCheatWarning, setShowCheatWarning] = useState(false);
   const { localParticipant } = useLocalParticipant();
   const participants = useParticipants();
+  const room = useRoomContext();
+  const [distractedStudents, setDistractedStudents] = useState<Participant[]>([]);
+
+  // Update distracted students list whenever attributes change
+  useEffect(() => {
+    const updateDistracted = () => {
+      const allParticipants = Array.from(room.remoteParticipants.values());
+      setDistractedStudents(allParticipants.filter(p => p.attributes?.isDistracted === "true"));
+    };
+
+    room.on(RoomEvent.ParticipantAttributesChanged, updateDistracted);
+    room.on(RoomEvent.ParticipantConnected, updateDistracted);
+    room.on(RoomEvent.ParticipantDisconnected, updateDistracted);
+
+    updateDistracted(); // Initial check
+
+    return () => {
+      room.off(RoomEvent.ParticipantAttributesChanged, updateDistracted);
+      room.off(RoomEvent.ParticipantConnected, updateDistracted);
+      room.off(RoomEvent.ParticipantDisconnected, updateDistracted);
+    };
+  }, [room]);
 
   useEffect(() => {
     if (isTeacher || !localParticipant) return;
@@ -532,8 +555,6 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [isTeacher, localParticipant]);
-
-  const distractedStudents = participants.filter(p => p.attributes?.isDistracted === "true" && p !== localParticipant);
 
   const tracks = useTracks(
     [
