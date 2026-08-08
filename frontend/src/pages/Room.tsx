@@ -504,13 +504,17 @@ function CustomParticipantTile(props: any) {
 
 function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const [chatOpen, setChatOpen] = useState(false);
+  const [showCheatWarning, setShowCheatWarning] = useState(false);
   const { localParticipant } = useLocalParticipant();
   const participants = useParticipants();
 
   useEffect(() => {
     if (isTeacher || !localParticipant) return;
 
-    const handleFocusLoss = () => localParticipant.setAttributes({ isDistracted: "true" });
+    const handleFocusLoss = () => {
+      localParticipant.setAttributes({ isDistracted: "true" });
+      setShowCheatWarning(true);
+    };
     const handleFocusGain = () => localParticipant.setAttributes({ isDistracted: "false" });
 
     const handleVisibilityChange = () => {
@@ -559,6 +563,27 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
               <li key={p.identity}><strong>{p.name || p.identity}</strong> is not looking at the app.</li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Student Distraction Warning */}
+      {!isTeacher && showCheatWarning && (
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 100,
+          background: 'rgba(220, 38, 38, 0.95)', color: 'white', textAlign: 'center',
+          padding: '30px', borderRadius: '16px', boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
+          maxWidth: '400px', backdropFilter: 'blur(15px)', border: '2px solid #FCA5A5'
+        }}>
+          <AlertTriangle size={64} style={{ marginBottom: '15px', color: '#FEF08A' }} />
+          <h2 style={{ margin: '0 0 10px 0' }}>Warning!</h2>
+          <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem' }}>You switched tabs or lost focus on the app. Your teacher has been notified of this activity.</p>
+          <button 
+            className="lk-button" 
+            style={{ background: 'white', color: '#DC2626', fontWeight: 'bold' }}
+            onClick={() => setShowCheatWarning(false)}
+          >
+            I Understand
+          </button>
         </div>
       )}
 
