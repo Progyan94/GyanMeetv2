@@ -59,3 +59,7 @@
   background-color: rgba(0,0,0,0.8) !important;
   border-top: 1px solid rgba(255, 153, 51, 0.2);
 }
+
+.lk-chat-header {
+  display: none !important;
+}

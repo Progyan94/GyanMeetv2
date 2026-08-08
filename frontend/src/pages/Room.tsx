@@ -679,19 +679,31 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
         {/* Chat Sidebar (Always mounted to receive messages, but visually hidden when closed) */}
         <div style={{ 
           width: '320px', 
+          maxWidth: '100%',
           borderLeft: '1px solid var(--border-color)', 
           background: 'var(--card-bg)', 
           display: chatOpen ? 'flex' : 'none', 
-          flexDirection: 'column' 
+          flexDirection: 'column',
+          boxSizing: 'border-box'
         }}>
-          <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold' }}>Meeting Chat</div>
+          <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Meeting Chat</span>
+            <button onClick={() => setChatOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex' }}>
+              <XCircle size={20} />
+            </button>
+          </div>
           <Chat style={{ flex: 1, height: 'calc(100% - 50px)' }} />
         </div>
 
         {/* Participants Sidebar */}
         {participantsOpen && (
-          <div style={{ width: '320px', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold' }}>Participants ({participants.length})</div>
+          <div style={{ width: '320px', maxWidth: '100%', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Participants ({participants.length})</span>
+              <button onClick={() => setParticipantsOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex' }}>
+                <XCircle size={20} />
+              </button>
+            </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {participants.map(p => (
                 <div key={p.identity} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-color)', padding: '10px', borderRadius: '8px' }}>
