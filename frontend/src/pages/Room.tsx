@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
-import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX } from 'lucide-react';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { RoomEvent, Track, Participant } from 'livekit-client';
 import {
@@ -111,7 +111,7 @@ const deleteBackgroundFromDB = async (id: number): Promise<void> => {
   });
 };
 
-function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boolean, chatOpen: boolean, setChatOpen: (v: boolean) => void }) {
+function CustomControlBar({ isTeacher, chatOpen, setChatOpen, participantsOpen, setParticipantsOpen }: { isTeacher: boolean, chatOpen: boolean, setChatOpen: (v: boolean) => void, participantsOpen: boolean, setParticipantsOpen: (v: boolean) => void }) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
   const participants = useParticipants();
@@ -368,8 +368,12 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen }: { isTeacher: boo
       <TrackToggle source={Track.Source.Camera} />
       <TrackToggle source={Track.Source.ScreenShare} />
       
-      <button className="lk-button" onClick={() => setChatOpen(!chatOpen)} style={{ background: chatOpen ? 'var(--primary-saffron)' : '' }}>
+      <button className="lk-button" onClick={() => { setChatOpen(!chatOpen); setParticipantsOpen(false); }} style={{ background: chatOpen ? 'var(--primary-saffron)' : '' }}>
         Chat
+      </button>
+
+      <button className="lk-button" onClick={() => { setParticipantsOpen(!participantsOpen); setChatOpen(false); }} style={{ background: participantsOpen ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Users size={16}/> {participants.length}
       </button>
 
       <button className="lk-button" onClick={toggleHandRaise} style={{ background: handRaised ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -487,8 +491,12 @@ function CustomParticipantTile(props: any) {
   const isDistracted = participant?.attributes?.isDistracted === "true";
   
   return (
-    <div style={{ position: 'relative', height: '100%', width: '100%', border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}>
-      <ParticipantTile trackReference={trackReference} participant={directParticipant} {...rest} />
+    <ParticipantTile 
+      trackReference={trackReference} 
+      participant={directParticipant} 
+      style={{ border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}
+      {...rest}
+    >
       {isHandRaised && (
         <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Hand size={24} color="white"/>
@@ -499,15 +507,17 @@ function CustomParticipantTile(props: any) {
           <AlertTriangle size={18}/> Distracted
         </div>
       )}
-    </div>
+    </ParticipantTile>
   );
 }
 
 function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const [chatOpen, setChatOpen] = useState(false);
+  const [participantsOpen, setParticipantsOpen] = useState(false);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
+  const participants = useParticipants();
   const [distractedStudents, setDistractedStudents] = useState<Participant[]>([]);
 
   // Update distracted students list whenever attributes change
@@ -622,16 +632,46 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
             </GridLayout>
           )}
         </div>
-        <CustomControlBar isTeacher={isTeacher} chatOpen={chatOpen} setChatOpen={setChatOpen} />
+        <CustomControlBar isTeacher={isTeacher} chatOpen={chatOpen} setChatOpen={setChatOpen} participantsOpen={participantsOpen} setParticipantsOpen={setParticipantsOpen} />
       </div>
 
-      {/* Chat Sidebar */}
-      {chatOpen && (
-        <div style={{ width: '320px', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column' }}>
+      {/* Sidebars */}
+      <div style={{ display: 'flex', height: '100%' }}>
+        {/* Chat Sidebar (Always mounted to receive messages, but visually hidden when closed) */}
+        <div style={{ 
+          width: '320px', 
+          borderLeft: '1px solid var(--border-color)', 
+          background: 'var(--card-bg)', 
+          display: chatOpen ? 'flex' : 'none', 
+          flexDirection: 'column' 
+        }}>
           <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold' }}>Meeting Chat</div>
           <Chat style={{ flex: 1, height: 'calc(100% - 50px)' }} />
         </div>
-      )}
+
+        {/* Participants Sidebar */}
+        {participantsOpen && (
+          <div style={{ width: '320px', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold' }}>Participants ({participants.length})</div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {participants.map(p => (
+                <div key={p.identity} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-color)', padding: '10px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--primary-saffron)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      {(p.name || p.identity).charAt(0).toUpperCase()}
+                    </div>
+                    <span>{p.name || p.identity} {p === localParticipant ? "(You)" : ""}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    {p.attributes?.handRaised === "true" && <Hand size={16} color="var(--primary-saffron)" />}
+                    {p.attributes?.isDistracted === "true" && <AlertTriangle size={16} color="#DC2626" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
