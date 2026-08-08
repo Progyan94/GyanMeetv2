@@ -480,23 +480,30 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen, participantsOpen, 
 }
 
 function CustomParticipantTile(props: any) {
-  // LiveKit's layout components pass trackReference as a prop
-  const { trackReference, participant: directParticipant, ...rest } = props;
-  
-  // Try to get participant from trackReference, fallback to direct prop (just in case)
+  // Extract style and className for the wrapper so LiveKit grid can properly size and position it
+  const { trackReference, participant: directParticipant, style, className, ...rest } = props;
   const participant = trackReference?.participant || directParticipant;
   
-  // Read the attributes for hand raised state safely
   const isHandRaised = participant?.attributes?.handRaised === "true";
   const isDistracted = participant?.attributes?.isDistracted === "true";
   
   return (
-    <ParticipantTile 
-      trackReference={trackReference} 
-      participant={directParticipant} 
-      style={{ border: isDistracted ? '4px solid #DC2626' : 'none', borderRadius: '8px', boxSizing: 'border-box' }}
+    <div 
+      style={{ 
+        ...style, 
+        border: isDistracted ? '4px solid #DC2626' : 'none', 
+        borderRadius: '8px', 
+        boxSizing: 'border-box',
+        position: 'relative'
+      }} 
+      className={className}
       {...rest}
     >
+      <ParticipantTile 
+        trackReference={trackReference} 
+        participant={directParticipant} 
+        style={{ width: '100%', height: '100%', borderRadius: '4px' }}
+      />
       {isHandRaised && (
         <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 5, background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Hand size={24} color="white"/>
@@ -507,7 +514,7 @@ function CustomParticipantTile(props: any) {
           <AlertTriangle size={18}/> Distracted
         </div>
       )}
-    </ParticipantTile>
+    </div>
   );
 }
 
