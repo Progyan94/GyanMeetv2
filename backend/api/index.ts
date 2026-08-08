@@ -62,7 +62,13 @@ app.post('/api/token', async (req, res) => {
       name: participantName,
     });
 
-    at.addGrant({ roomJoin: true, room: roomName, canPublish: true, canSubscribe: true });
+    at.addGrant({ 
+      roomJoin: true, 
+      room: roomName, 
+      canPublish: true, 
+      canSubscribe: true,
+      canUpdateOwnMetadata: true 
+    });
 
     const token = await at.toJwt();
     res.json({ token });
