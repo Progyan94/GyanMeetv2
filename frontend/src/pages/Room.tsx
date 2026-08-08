@@ -497,9 +497,9 @@ function CustomParticipantTile(props: any) {
         position: 'relative'
       }} 
       className={className}
-      {...rest}
     >
       <ParticipantTile 
+        {...rest}
         trackReference={trackReference} 
         participant={directParticipant} 
         style={{ width: '100%', height: '100%', borderRadius: '4px' }}
