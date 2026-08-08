@@ -20,7 +20,7 @@ import {
   Chat,
   LayoutContextProvider,
 } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+
 import { BackgroundBlur, VirtualBackground } from '@livekit/track-processors';
 import '@livekit/components-styles';
 import './Room.css';
@@ -507,7 +507,6 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
   const { localParticipant } = useLocalParticipant();
-  const participants = useParticipants();
   const room = useRoomContext();
   const [distractedStudents, setDistractedStudents] = useState<Participant[]>([]);
 
