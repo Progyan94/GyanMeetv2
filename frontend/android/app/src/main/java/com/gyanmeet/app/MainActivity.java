@@ -2,9 +2,8 @@ package com.gyanmeet.app;
 
 import android.os.Bundle;
 import android.Manifest;
-import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -12,18 +11,11 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Explicitly request WebRTC permissions on app launch
-        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-        boolean needsRequest = false;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                needsRequest = true;
-                break;
-            }
-        }
+        ActivityResultLauncher<String[]> permissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(),
+            result -> {}
+        );
         
-        if (needsRequest) {
-            ActivityCompat.requestPermissions(this, permissions, 1);
-        }
+        permissionLauncher.launch(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO});
     }
 }
