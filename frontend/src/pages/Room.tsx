@@ -520,11 +520,43 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   const participants = useParticipants();
   const [distractedStudents, setDistractedStudents] = useState<Participant[]>([]);
 
+  const playAlarm = () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, ctx.currentTime); // urgent beep frequency
+      osc.frequency.setValueAtTime(600, ctx.currentTime + 0.1); 
+      
+      gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } catch (e) {
+      console.error("Audio API failed", e);
+    }
+  };
+
   // Update distracted students list whenever attributes change
   useEffect(() => {
     const updateDistracted = () => {
       const allParticipants = Array.from(room.remoteParticipants.values());
-      setDistractedStudents(allParticipants.filter(p => p.attributes?.isDistracted === "true"));
+      const newlyDistracted = allParticipants.filter(p => p.attributes?.isDistracted === "true");
+      
+      setDistractedStudents(prev => {
+        if (isTeacher && newlyDistracted.length > prev.length) {
+          playAlarm();
+        }
+        return newlyDistracted;
+      });
     };
 
     room.on(RoomEvent.ParticipantAttributesChanged, updateDistracted);
