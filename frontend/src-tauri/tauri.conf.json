@@ -36,7 +36,11 @@
         "exceptionDomain": "",
         "frameworks": [],
         "providerShortName": null,
-        "signingIdentity": null
+        "signingIdentity": null,
+        "infoPlist": {
+          "NSCameraUsageDescription": "GyanMeet requires access to your camera for video conferencing.",
+          "NSMicrophoneUsageDescription": "GyanMeet requires access to your microphone for audio conferencing."
+        }
       },
       "resources": [],
       "shortDescription": "",
