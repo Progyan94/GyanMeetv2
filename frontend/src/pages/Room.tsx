@@ -961,6 +961,15 @@ export default function Room() {
     }
   }, [id]);
 
+  const [lastAutoJoinId, setLastAutoJoinId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id && joinState === 'form' && lastAutoJoinId !== id) {
+      setLastAutoJoinId(id);
+      joinMeeting(id);
+    }
+  }, [id, joinState, lastAutoJoinId]);
+
   const joinMeeting = async (targetRoom: string) => {
     if (!targetRoom.trim()) return;
     
