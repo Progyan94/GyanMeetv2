@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
 import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy } from 'lucide-react';
 import { signOut } from 'firebase/auth';
-import { RoomEvent, Track, Participant } from 'livekit-client';
+import { RoomEvent, Track, Participant, createLocalVideoTrack, LocalVideoTrack } from 'livekit-client';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -111,7 +111,23 @@ const deleteBackgroundFromDB = async (id: number): Promise<void> => {
   });
 };
 
-function CustomControlBar({ isTeacher, chatOpen, setChatOpen, participantsOpen, setParticipantsOpen }: { isTeacher: boolean, chatOpen: boolean, setChatOpen: (v: boolean) => void, participantsOpen: boolean, setParticipantsOpen: (v: boolean) => void }) {
+function CustomControlBar({ 
+  isTeacher, 
+  chatOpen, 
+  setChatOpen, 
+  participantsOpen, 
+  setParticipantsOpen,
+  initialBgMode,
+  initialBgUrl
+}: { 
+  isTeacher: boolean;
+  chatOpen: boolean;
+  setChatOpen: (v: boolean) => void;
+  participantsOpen: boolean;
+  setParticipantsOpen: (v: boolean) => void;
+  initialBgMode?: 'none'|'blur'|'image';
+  initialBgUrl?: string;
+}) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
   const participants = useParticipants();
@@ -129,6 +145,20 @@ function CustomControlBar({ isTeacher, chatOpen, setChatOpen, participantsOpen, 
   useEffect(() => {
     loadBackgroundsFromDB().then(bgs => setCustomBgs(bgs)).catch(console.error);
   }, []);
+
+  const [initialBgApplied, setInitialBgApplied] = useState(false);
+  useEffect(() => {
+    if (initialBgApplied || !localParticipant) return;
+    const track = localParticipant.getTrackPublication(Track.Source.Camera)?.videoTrack;
+    if (track) {
+      setInitialBgApplied(true);
+      if (initialBgMode === 'blur') {
+        track.setProcessor(BackgroundBlur(10)).then(() => setBlurEnabled(true)).catch(console.error);
+      } else if (initialBgMode === 'image' && initialBgUrl) {
+        track.setProcessor(VirtualBackground(initialBgUrl)).then(() => setBgImageEnabled(true)).catch(console.error);
+      }
+    }
+  }, [localParticipant, initialBgApplied, initialBgMode, initialBgUrl]);
 
   const getCameraTrack = () => {
     if (!localParticipant) return null;
@@ -518,7 +548,7 @@ function CustomParticipantTile(props: any) {
   );
 }
 
-function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
+function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isTeacher: boolean, initialBgMode?: 'none'|'blur'|'image', initialBgUrl?: string }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [participantsOpen, setParticipantsOpen] = useState(false);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
@@ -671,7 +701,15 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
             </GridLayout>
           )}
         </div>
-        <CustomControlBar isTeacher={isTeacher} chatOpen={chatOpen} setChatOpen={setChatOpen} participantsOpen={participantsOpen} setParticipantsOpen={setParticipantsOpen} />
+        <CustomControlBar 
+          isTeacher={isTeacher} 
+          chatOpen={chatOpen} 
+          setChatOpen={setChatOpen} 
+          participantsOpen={participantsOpen} 
+          setParticipantsOpen={setParticipantsOpen} 
+          initialBgMode={initialBgMode}
+          initialBgUrl={initialBgUrl}
+        />
       </div>
 
       {/* Sidebars */}
@@ -729,6 +767,168 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
 
 import { useParams, useNavigate } from 'react-router-dom';
 
+function CustomPreJoin({ 
+  roomName, 
+  onJoin, 
+  onCancel 
+}: { 
+  roomName: string;
+  onJoin: (opts: { cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string }) => void;
+  onCancel: () => void;
+}) {
+  const [camEnabled, setCamEnabled] = useState(true);
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [bgMode, setBgMode] = useState<'none'|'blur'|'image'>('none');
+  const [bgUrl, setBgUrl] = useState<string | undefined>();
+  const [videoTrack, setVideoTrack] = useState<LocalVideoTrack | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [bgMenuOpen, setBgMenuOpen] = useState(false);
+  const [customBgs, setCustomBgs] = useState<{id: number, url: string}[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadBackgroundsFromDB().then(bgs => setCustomBgs(bgs)).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    let currentTrack: LocalVideoTrack | null = null;
+    
+    if (camEnabled) {
+      createLocalVideoTrack().then(track => {
+        currentTrack = track;
+        setVideoTrack(track);
+        if (videoRef.current) {
+          track.attach(videoRef.current);
+        }
+      }).catch(err => {
+        console.error("Failed to acquire camera", err);
+        setCamEnabled(false);
+      });
+    } else {
+      if (videoTrack) {
+        videoTrack.stop();
+        setVideoTrack(null);
+      }
+    }
+
+    return () => {
+      if (currentTrack) currentTrack.stop();
+    };
+  }, [camEnabled]);
+
+  const applyProcessor = async (track: LocalVideoTrack, mode: 'none'|'blur'|'image', url?: string) => {
+    try {
+      await track.stopProcessor();
+      if (mode === 'blur') {
+        await track.setProcessor(BackgroundBlur(10));
+      } else if (mode === 'image' && url) {
+        await track.setProcessor(VirtualBackground(url));
+      }
+    } catch (e) {
+      console.error("Processor apply failed in preview:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (videoTrack) {
+      applyProcessor(videoTrack, bgMode, bgUrl);
+    }
+  }, [bgMode, bgUrl, videoTrack]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await saveBackgroundToDB(file);
+      const bgs = await loadBackgroundsFromDB();
+      setCustomBgs(bgs);
+      if (bgs.length > 0) {
+        setBgUrl(bgs[bgs.length - 1].url);
+        setBgMode('image');
+      }
+    } catch(err) {
+      console.error("Failed to save background", err);
+    }
+  };
+
+  return (
+    <div className="join-container" style={{ flexDirection: 'column' }}>
+      <button className="header-logout" onClick={onCancel}>Back</button>
+      <div className="card join-card" style={{ maxWidth: '800px', width: '90%', display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
+        
+        <div style={{ flex: 1, position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#000', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {camEnabled ? (
+            <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', background: '#333' }}>
+              <ImageOff size={48} />
+            </div>
+          )}
+          
+          <div style={{ position: 'absolute', bottom: '15px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <button className="lk-button" onClick={() => setMicEnabled(!micEnabled)} style={{ background: !micEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)' }}>
+              {micEnabled ? 'Mic On' : 'Mic Off'}
+            </button>
+            <button className="lk-button" onClick={() => setCamEnabled(!camEnabled)} style={{ background: !camEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)' }}>
+              {camEnabled ? 'Cam On' : 'Cam Off'}
+            </button>
+            <div style={{ position: 'relative' }}>
+              <button className="lk-button" onClick={() => setBgMenuOpen(!bgMenuOpen)} style={{ background: bgMode !== 'none' ? 'var(--primary-saffron)' : 'rgba(0,0,0,0.6)' }}>
+                Effects {bgMenuOpen ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+              </button>
+              {bgMenuOpen && (
+                <div style={{
+                  position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+                  background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                  padding: '10px', borderRadius: '12px', display: 'flex', flexDirection: 'column',
+                  gap: '8px', marginBottom: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', minWidth: '150px', zIndex: 100
+                }}>
+                  <button className="lk-button" onClick={() => { setBgMode('blur'); setBgMenuOpen(false); }} style={{ width: '100%' }}>Blur</button>
+                  <button className="lk-button" onClick={() => fileInputRef.current?.click()} style={{ width: '100%' }}>Upload Custom</button>
+                  <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '5px' }}>
+                    <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=100&q=80" onClick={() => { setBgUrl("https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1280&q=80"); setBgMode('image'); setBgMenuOpen(false); }} style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }} />
+                    <img src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=100&q=80" onClick={() => { setBgUrl("https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=1280&q=80"); setBgMode('image'); setBgMenuOpen(false); }} style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }} />
+                    {customBgs.map(bg => (
+                      <div key={bg.id} style={{ position: 'relative' }}>
+                        <img src={bg.url} onClick={() => { setBgUrl(bg.url); setBgMode('image'); setBgMenuOpen(false); }} style={{ width: '40px', height: '40px', borderRadius: '5px', cursor: 'pointer', objectFit: 'cover' }} />
+                        <div onClick={(e) => { e.stopPropagation(); URL.revokeObjectURL(bg.url); deleteBackgroundFromDB(bg.id).then(() => loadBackgroundsFromDB().then(setCustomBgs)); if (bgUrl === bg.url) setBgMode('none'); }} style={{ position: 'absolute', top: -5, right: -5, background: 'red', color: 'white', borderRadius: '50%', width: 16, height: 16, fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>✕</div>
+                      </div>
+                    ))}
+                  </div>
+                  {bgMode !== 'none' && (
+                    <button className="lk-button" onClick={() => { setBgMode('none'); setBgMenuOpen(false); }} style={{ width: '100%', background: '#EF4444', marginTop: '5px' }}>Clear</button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImageUpload} />
+        </div>
+
+        <div style={{ flex: '0 0 250px', display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center' }}>
+          <h2 style={{ margin: '0 0 10px 0' }}>Ready to join?</h2>
+          <p style={{ margin: '0 0 20px 0', color: 'var(--text-sub)' }}>Room: <strong style={{color: 'var(--primary-saffron)'}}>{roomName}</strong></p>
+          <button 
+            className="btn-primary" 
+            onClick={() => onJoin({ cam: camEnabled, mic: micEnabled, present: false, bgMode, bgUrl })}
+          >
+            Join Now
+          </button>
+          <button 
+            className="btn-primary" 
+            style={{ background: 'transparent', border: '1px solid var(--primary-saffron)', color: 'var(--primary-saffron)' }}
+            onClick={() => onJoin({ cam: false, mic: false, present: true, bgMode: 'none' })}
+          >
+            Companion Mode
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 export default function Room() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -736,6 +936,9 @@ export default function Room() {
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const [joinState, setJoinState] = useState<'form' | 'prejoin' | 'joined'>('form');
+  const [joinOpts, setJoinOpts] = useState<{ cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string } | null>(null);
   
   const user = auth.currentUser;
   
@@ -790,6 +993,7 @@ export default function Room() {
       }
       
       setToken(data.token);
+      setJoinState('prejoin');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -810,7 +1014,7 @@ export default function Room() {
 
   const handleLogout = () => signOut(auth);
 
-  if (token === '') {
+  if (joinState === 'form') {
     return (
       <div className="join-container">
         <button className="header-logout" onClick={handleLogout}>Sign Out</button>
@@ -878,6 +1082,22 @@ export default function Room() {
     );
   }
 
+  if (joinState === 'prejoin') {
+    return (
+      <CustomPreJoin 
+        roomName={roomName} 
+        onJoin={(opts) => {
+          setJoinOpts(opts);
+          setJoinState('joined');
+        }} 
+        onCancel={() => {
+          setJoinState('form');
+          setToken('');
+        }} 
+      />
+    );
+  }
+
   return (
     <div className="room-container">
       <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10, display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -900,17 +1120,26 @@ export default function Room() {
         </div>
       </div>
       <LiveKitRoom
-        video={true}
-        audio={true}
+        video={joinOpts?.cam ?? true}
+        audio={joinOpts?.mic ?? true}
+        screen={joinOpts?.present ?? false}
         token={token}
         serverUrl={serverUrl}
         data-lk-theme="default"
         style={{ height: '100vh', position: 'relative' }}
-        onDisconnected={() => setToken('')}
+        onDisconnected={() => {
+          setToken('');
+          setJoinState('form');
+          setJoinOpts(null);
+        }}
       >
         <LayoutContextProvider>
           <ErrorBoundary>
-            <CustomVideoConference isTeacher={isTeacher} />
+            <CustomVideoConference 
+              isTeacher={isTeacher} 
+              initialBgMode={joinOpts?.bgMode} 
+              initialBgUrl={joinOpts?.bgUrl} 
+            />
             <RoomAudioRenderer />
           </ErrorBoundary>
         </LayoutContextProvider>
