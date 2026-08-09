@@ -33,7 +33,7 @@ function DeepLinkListener() {
     let unlistenTauri: (() => void) | undefined;
     
     // Check if running inside Tauri
-    if (window.__TAURI__) {
+    if ((window as any).__TAURI__) {
       listen('scheme-request-received', (event: any) => {
         const payload = event.payload; // "gyanmeet://room/1234"
         if (typeof payload === 'string' && payload.startsWith('gyanmeet://')) {
