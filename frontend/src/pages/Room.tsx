@@ -743,6 +743,21 @@ export default function Room() {
   const TEACHER_EMAIL = import.meta.env.VITE_TEACHER_EMAIL || "gyanclassesabacus2014@gmail.com";
   const isTeacher = user?.email === TEACHER_EMAIL;
 
+  // Auto-launch the app via hidden iframe if on web and joining via link
+  useEffect(() => {
+    if (id && !(window as any).__TAURI__) {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `gyanmeet://room/${id}`;
+      document.body.appendChild(iframe);
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 1000);
+    }
+  }, [id]);
+
   const joinMeeting = async (targetRoom: string) => {
     if (!targetRoom.trim()) return;
     
