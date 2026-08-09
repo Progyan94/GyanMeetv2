@@ -11,11 +11,13 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.5.0",
     "@excalidraw/excalidraw": "^0.18.1",
     "@livekit/components-react": "^2.9.23",
     "@livekit/components-styles": "^1.2.0",
     "@livekit/track-processors": "^0.7.2",
+    "@tauri-apps/api": "^2.11.1",
     "firebase": "^12.16.0",
     "livekit-client": "^2.20.1",
     "lucide-react": "^1.25.0",

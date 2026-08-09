@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../firebase';
-import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users } from 'lucide-react';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { RoomEvent, Track, Participant } from 'livekit-client';
 import {
@@ -727,8 +727,12 @@ function CustomVideoConference({ isTeacher }: { isTeacher: boolean }) {
   );
 }
 
+import { useParams, useNavigate } from 'react-router-dom';
+
 export default function Room() {
-  const [roomName, setRoomName] = useState('');
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [roomName, setRoomName] = useState(id || '');
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -741,6 +745,10 @@ export default function Room() {
 
   const joinMeeting = async (targetRoom: string) => {
     if (!targetRoom.trim()) return;
+    
+    if (targetRoom !== id) {
+      navigate(`/room/${targetRoom}`, { replace: true });
+    }
     
     const participantName = user?.displayName || user?.email?.split('@')[0] || 'Student';
 
@@ -830,6 +838,16 @@ export default function Room() {
             <button type="submit" className="btn-primary" disabled={loading} style={{ background: isTeacher ? 'var(--text-sub)' : 'var(--primary-saffron)' }}>
               {loading ? 'Joining...' : 'Join Existing Class'}
             </button>
+            
+            {roomName && !(window as any).__TAURI__ && (
+              <a 
+                href={`gyanmeet://room/${roomName}`} 
+                className="btn-primary" 
+                style={{ background: 'transparent', border: '1px solid var(--primary-saffron)', color: 'var(--primary-saffron)', textDecoration: 'none', textAlign: 'center', marginTop: '10px', display: 'block' }}
+              >
+                Launch in Desktop App
+              </a>
+            )}
           </form>
           
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -854,6 +872,16 @@ export default function Room() {
         <div style={{ background: 'rgba(0,0,0,0.6)', padding: '5px 15px', borderRadius: '8px', fontSize: '1rem', display: 'flex', gap: '10px', alignItems: 'center', border: '1px solid var(--primary-saffron-light)' }}>
           <span style={{ color: '#ccc' }}>Class Code:</span>
           <span style={{ fontWeight: 'bold', letterSpacing: '1px', userSelect: 'all' }}>{roomName}</span>
+          <button 
+            onClick={() => {
+              navigator.clipboard.writeText(`https://gyan-meetv2.vercel.app/room/${roomName}`);
+              alert('Invite link copied to clipboard!');
+            }}
+            style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 5px' }}
+            title="Copy Invite Link"
+          >
+            <Copy size={16} />
+          </button>
         </div>
       </div>
       <LiveKitRoom
