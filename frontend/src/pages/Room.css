@@ -24,10 +24,15 @@
   gap: 1.5rem;
 }
 
-.header-logout {
+.header-controls {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.header-logout {
   background: transparent;
   color: var(--text-main);
   border: 1px solid var(--border-color);
@@ -40,7 +45,7 @@
 }
 
 .header-logout:hover {
-  background: white;
+  background: var(--bg-card);
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 

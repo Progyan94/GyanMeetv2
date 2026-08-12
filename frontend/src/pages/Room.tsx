@@ -855,7 +855,9 @@ function CustomPreJoin({
 
   return (
     <div className="join-container" style={{ flexDirection: 'column' }}>
-      <button className="header-logout" onClick={onCancel}>Back</button>
+      <div className="header-controls">
+        <button className="header-logout" onClick={onCancel}>Back</button>
+      </div>
       <div className="card join-card" style={{ maxWidth: '800px', width: '90%', display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
         
         <div style={{ flex: 1, position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#000', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1027,7 +1029,7 @@ export default function Room() {
   if (joinState === 'form') {
     return (
       <div className="join-container">
-        <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', gap: '0.5rem' }}>
+        <div className="header-controls">
           <a href="https://gyanmeet-downloads.vercel.app/" target="_blank" rel="noreferrer" className="header-logout" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
             <Download size={18} />
             Download App
