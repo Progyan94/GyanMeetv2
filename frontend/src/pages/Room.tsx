@@ -933,6 +933,7 @@ function CustomPreJoin({
 }
 
 export default function Room() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const { id } = useParams();
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState(id || '');
@@ -1034,8 +1035,8 @@ export default function Room() {
             <Download size={18} />
             Download App
           </a>
-          <button className="header-logout" onClick={() => useContext(ThemeContext).toggleTheme()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {useContext(ThemeContext).theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <button className="header-logout" onClick={toggleTheme} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button className="header-logout" onClick={handleLogout}>Sign Out</button>
         </div>
