@@ -10,6 +10,59 @@
   --error-color: #EF4444;
 }
 
+[data-theme="dark"] {
+  --primary-saffron: #6366f1;
+  --primary-saffron-hover: #8b5cf6;
+  --primary-saffron-light: rgba(99, 102, 241, 0.15);
+  --bg-color: #0a0a0f;
+  --bg-card: rgba(20, 20, 30, 0.6);
+  --text-main: #ffffff;
+  --text-sub: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Background Mesh / Blobs for Dark Mode */
+.background-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  filter: blur(100px);
+  border-radius: 50%;
+  animation: float 20s infinite ease-in-out alternate;
+  opacity: 0.4;
+}
+
+.blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, var(--primary-saffron), transparent 70%);
+}
+
+.blob-2 {
+  bottom: -20%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, var(--primary-saffron-hover), transparent 70%);
+  animation-delay: -5s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

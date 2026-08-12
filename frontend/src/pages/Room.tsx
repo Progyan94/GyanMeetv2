@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { auth } from '../firebase';
-import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy } from 'lucide-react';
+import { ThemeContext } from '../App';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy, Sun, Moon, Download, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { RoomEvent, Track, Participant, createLocalVideoTrack, LocalVideoTrack } from 'livekit-client';
 import {
@@ -866,12 +867,12 @@ function CustomPreJoin({
             </div>
           )}
           
-          <div style={{ position: 'absolute', bottom: '15px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-            <button className="lk-button" onClick={() => setMicEnabled(!micEnabled)} style={{ background: !micEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)' }}>
-              {micEnabled ? 'Mic On' : 'Mic Off'}
+          <div style={{ position: 'absolute', bottom: '15px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '12px' }}>
+            <button className="lk-button" onClick={() => setMicEnabled(!micEnabled)} style={{ background: !micEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)', width: '48px', height: '48px', borderRadius: '50%', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {micEnabled ? <Mic size={20} color="white" /> : <MicOff size={20} color="white" />}
             </button>
-            <button className="lk-button" onClick={() => setCamEnabled(!camEnabled)} style={{ background: !camEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)' }}>
-              {camEnabled ? 'Cam On' : 'Cam Off'}
+            <button className="lk-button" onClick={() => setCamEnabled(!camEnabled)} style={{ background: !camEnabled ? '#DC2626' : 'rgba(0,0,0,0.6)', width: '48px', height: '48px', borderRadius: '50%', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {camEnabled ? <Video size={20} color="white" /> : <VideoOff size={20} color="white" />}
             </button>
             <div style={{ position: 'relative' }}>
               <button className="lk-button" onClick={() => setBgMenuOpen(!bgMenuOpen)} style={{ background: bgMode !== 'none' ? 'var(--primary-saffron)' : 'rgba(0,0,0,0.6)' }}>
@@ -1026,7 +1027,16 @@ export default function Room() {
   if (joinState === 'form') {
     return (
       <div className="join-container">
-        <button className="header-logout" onClick={handleLogout}>Sign Out</button>
+        <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', gap: '0.5rem' }}>
+          <a href="https://gyanmeet-downloads.vercel.app/" target="_blank" rel="noreferrer" className="header-logout" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+            <Download size={18} />
+            Download App
+          </a>
+          <button className="header-logout" onClick={() => useContext(ThemeContext).toggleTheme()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {useContext(ThemeContext).theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button className="header-logout" onClick={handleLogout}>Sign Out</button>
+        </div>
         <div className="card join-card">
           <div style={{ textAlign: 'center' }}>
             <h2>{isTeacher ? "Teacher Dashboard" : "Join a Class"}</h2>

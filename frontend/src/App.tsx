@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, createContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -56,8 +56,28 @@ function DeepLinkListener() {
   return null;
 }
 
+export const ThemeContext = createContext<{ theme: 'light' | 'dark', toggleTheme: () => void }>({
+  theme: 'light',
+  toggleTheme: () => {}
+});
+
 function App() {
   const [user, loading] = useAuthState(auth);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const newTheme = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,15 +96,23 @@ function App() {
   }
 
   return (
-    <Router>
-      <DeepLinkListener />
-      <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
-        <Route path="/" element={user ? <Room /> : <Navigate to="/login" />} />
-        <Route path="/room/:id" element={user ? <Room /> : <Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <Router>
+        {theme === 'dark' && (
+          <div className="background-mesh">
+            <div className="blob blob-1"></div>
+            <div className="blob blob-2"></div>
+          </div>
+        )}
+        <DeepLinkListener />
+        <Routes>
+          <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+          <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
+          <Route path="/" element={user ? <Room /> : <Navigate to="/login" />} />
+          <Route path="/room/:id" element={user ? <Room /> : <Navigate to="/login" />} />
+        </Routes>
+      </Router>
+    </ThemeContext.Provider>
   );
 }
 
