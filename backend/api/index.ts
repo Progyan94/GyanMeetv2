@@ -57,8 +57,10 @@ app.post('/api/token', async (req, res) => {
   }
 
   try {
+    const uniqueIdentity = `${participantName}-${Math.random().toString(36).substring(2, 8)}`;
+    
     const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
-      identity: participantName,
+      identity: uniqueIdentity,
       name: participantName,
     });
 

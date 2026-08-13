@@ -16,9 +16,9 @@ function DeepLinkListener() {
   useEffect(() => {
     // Listen for Android/iOS App Links
     const capListener = CapacitorApp.addListener('appUrlOpen', data => {
-      // E.g. https://gyan-meetv2.vercel.app/room/1234
+      // E.g. https://gyanmeet.vercel.app/room/1234
       const url = new URL(data.url);
-      if (url.hostname === 'gyan-meetv2.vercel.app') {
+      if (url.hostname === 'gyanmeet.vercel.app') {
         const path = url.pathname;
         if (path) {
           navigate(path);

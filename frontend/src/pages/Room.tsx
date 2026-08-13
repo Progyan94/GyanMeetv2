@@ -988,7 +988,7 @@ export default function Room() {
     
     try {
       // Use the live Vercel backend URL
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyanmeet.vercel.app';
       
       const response = await fetch(`${backendUrl}/api/token`, {
         method: 'POST',
@@ -1131,7 +1131,7 @@ export default function Room() {
           <span style={{ fontWeight: 'bold', letterSpacing: '1px', userSelect: 'all' }}>{roomName}</span>
           <button 
             onClick={() => {
-              navigator.clipboard.writeText(`https://gyan-meetv2.vercel.app/room/${roomName}`);
+              navigator.clipboard.writeText(`https://gyanmeet.vercel.app/room/${roomName}`);
               alert('Invite link copied to clipboard!');
             }}
             style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 5px' }}
