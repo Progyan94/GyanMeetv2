@@ -338,7 +338,7 @@ function CustomControlBar({
     if (!newName || newName.trim() === '') return;
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
       const response = await fetch(`${backendUrl}/api/rename`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -375,7 +375,7 @@ function CustomControlBar({
     if (!window.confirm(`Are you sure you want to remove ${targetName}?`)) return;
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
       const response = await fetch(`${backendUrl}/api/remove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -988,7 +988,7 @@ export default function Room() {
     
     try {
       // Use the live Vercel backend URL
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyanmeet.vercel.app';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
       
       const response = await fetch(`${backendUrl}/api/token`, {
         method: 'POST',
