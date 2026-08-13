@@ -81,6 +81,28 @@
   display: none; /* Chrome, Safari and Opera */
 }
 
+/* Hide the text in the TrackToggle buttons if it's in a span */
+.lk-control-bar .lk-button .lk-button-text {
+  display: none !important;
+}
+
+/* Make sure all buttons are square/compact and hide naked text */
+.lk-control-bar .lk-button {
+  padding: 0.5rem;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0; /* Hides direct text nodes in LiveKit components */
+}
+
+/* Restore font size for our custom spans or SVGs */
+.lk-control-bar .lk-button > span,
+.lk-control-bar .lk-button > svg {
+  font-size: 1rem;
+}
+
 .panel-close-btn {
   position: absolute;
   top: 10px;

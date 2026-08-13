@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { auth } from '../firebase';
 import { ThemeContext } from '../App';
-import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, X, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy, Sun, Moon, Download, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, X, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy, Sun, Moon, Download, Mic, MicOff, Video, VideoOff, MessageSquare, Image as ImageIcon } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { Capacitor } from '@capacitor/core';
 import { RoomEvent, Track, Participant, createLocalVideoTrack, LocalVideoTrack } from 'livekit-client';
@@ -400,25 +400,27 @@ function CustomControlBar({
       <TrackToggle source={Track.Source.Camera} />
       {!Capacitor.isNativePlatform() && <TrackToggle source={Track.Source.ScreenShare} />}
       
-      <button className="lk-button" onClick={() => { setChatOpen(!chatOpen); setParticipantsOpen(false); }} style={{ background: chatOpen ? 'var(--primary-saffron)' : '' }}>
-        Chat
+      <button className="lk-button" title="Chat" onClick={() => { setChatOpen(!chatOpen); setParticipantsOpen(false); }} style={{ background: chatOpen ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <MessageSquare size={20} />
       </button>
 
-      <button className="lk-button" onClick={() => { setParticipantsOpen(!participantsOpen); setChatOpen(false); }} style={{ background: participantsOpen ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}>
-        <Users size={16}/> {participants.length}
+      <button className="lk-button" title="Participants" onClick={() => { setParticipantsOpen(!participantsOpen); setChatOpen(false); }} style={{ background: participantsOpen ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+        <Users size={20}/>
+        <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{participants.length}</span>
       </button>
 
-      <button className="lk-button" onClick={toggleHandRaise} style={{ background: handRaised ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}>
-        {handRaised ? <><HandMetal size={16}/> Lower Hand</> : <><Hand size={16}/> Raise Hand</>}
+      <button className="lk-button" title={handRaised ? "Lower Hand" : "Raise Hand"} onClick={toggleHandRaise} style={{ background: handRaised ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {handRaised ? <HandMetal size={20}/> : <Hand size={20}/>}
       </button>
       
       <div style={{ position: 'relative' }}>
         <button 
-          className="lk-button" 
+          className="lk-button"
+          title="Backgrounds"
           onClick={() => setBgMenuOpen(!bgMenuOpen)} 
-          style={{ background: (blurEnabled || bgImageEnabled) ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', gap: '5px' }}
+          style={{ background: (blurEnabled || bgImageEnabled) ? 'var(--primary-saffron)' : '', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          Backgrounds {bgMenuOpen ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+          <ImageIcon size={20} />
         </button>
 
         {bgMenuOpen && (
@@ -494,25 +496,27 @@ function CustomControlBar({
 
       {isTeacher && (
         <>
-          <button className="lk-button" onClick={handleRename} style={{ background: 'var(--text-sub)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Edit2 size={16}/> Rename Student
+          <button className="lk-button" title="Rename Student" onClick={handleRename} style={{ background: 'var(--text-sub)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Edit2 size={20}/>
           </button>
-          <button className="lk-button" onClick={handleRemove} style={{ background: '#DC2626', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <UserX size={16}/> Remove Student
+          <button className="lk-button" title="Remove Student" onClick={handleRemove} style={{ background: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <UserX size={20}/>
           </button>
           {recording ? (
-            <button className="lk-button" onClick={stopRecording} style={{ background: '#DC2626', animation: 'pulse 1.5s infinite', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Square size={16} fill="currentColor"/> Stop Recording
+            <button className="lk-button" title="Stop Recording" onClick={stopRecording} style={{ background: '#DC2626', animation: 'pulse 1.5s infinite', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Square size={20} fill="currentColor"/>
             </button>
           ) : (
-            <button className="lk-button" onClick={startRecording} style={{ background: '#10B981', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Circle size={16} fill="currentColor" color="#DC2626"/> Record Meeting
+            <button className="lk-button" title="Record Meeting" onClick={startRecording} style={{ background: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Circle size={20} fill="currentColor" color="#DC2626"/>
             </button>
           )}
         </>
       )}
 
-      <DisconnectButton>Leave</DisconnectButton>
+      <DisconnectButton title="Leave Meeting">
+        <XCircle size={20} />
+      </DisconnectButton>
     </div>
   );
 }
