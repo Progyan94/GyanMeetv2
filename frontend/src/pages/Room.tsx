@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { auth } from '../firebase';
 import { ThemeContext } from '../App';
-import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy, Sun, Moon, Download, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Hand, HandMetal, ChevronDown, ChevronUp, ImageOff, Upload, XCircle, X, Circle, Square, AlertTriangle, RefreshCw, Edit2, UserX, Users, Copy, Sun, Moon, Download, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import { signOut } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
 import { RoomEvent, Track, Participant, createLocalVideoTrack, LocalVideoTrack } from 'livekit-client';
 import {
   LiveKitRoom,
@@ -394,10 +395,10 @@ function CustomControlBar({
   };
 
   return (
-    <div className="lk-control-bar" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', padding: '1rem', width: '100%', position: 'absolute', bottom: 0, zIndex: 10, flexWrap: 'wrap' }}>
+    <div className="lk-control-bar">
       <TrackToggle source={Track.Source.Microphone} />
       <TrackToggle source={Track.Source.Camera} />
-      <TrackToggle source={Track.Source.ScreenShare} />
+      {!Capacitor.isNativePlatform() && <TrackToggle source={Track.Source.ScreenShare} />}
       
       <button className="lk-button" onClick={() => { setChatOpen(!chatOpen); setParticipantsOpen(false); }} style={{ background: chatOpen ? 'var(--primary-saffron)' : '' }}>
         Chat
@@ -425,8 +426,14 @@ function CustomControlBar({
             position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
             background: 'var(--card-bg)', border: '1px solid var(--border-color)',
             padding: '10px', borderRadius: '12px', display: 'flex', flexDirection: 'column',
-            gap: '8px', marginBottom: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', minWidth: '150px', zIndex: 100
+            gap: '8px', marginBottom: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', minWidth: '200px', zIndex: 100
           }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 'bold' }}>Backgrounds</span>
+              <button onClick={() => setBgMenuOpen(false)} className="panel-close-btn">
+                <X size={16} />
+              </button>
+            </div>
             <button className="lk-button" onClick={() => { toggleBlur(); setBgMenuOpen(false); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
               <ImageOff size={16}/> Blur Background
             </button>
@@ -714,21 +721,22 @@ function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isT
       </div>
 
       {/* Sidebars */}
-      <div style={{ display: 'flex', height: '100%' }}>
+      <div style={{ display: 'flex', height: '100%', position: 'absolute', right: 0, top: 0, bottom: '80px', zIndex: 20 }}>
         {/* Chat Sidebar (Always mounted to receive messages, but visually hidden when closed) */}
         <div style={{ 
           width: '320px', 
-          maxWidth: '100%',
+          maxWidth: '100vw',
           borderLeft: '1px solid var(--border-color)', 
           background: 'var(--card-bg)', 
           display: chatOpen ? 'flex' : 'none', 
           flexDirection: 'column',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          boxShadow: '-5px 0 15px rgba(0,0,0,0.5)'
         }}>
           <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Meeting Chat</span>
-            <button onClick={() => setChatOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex' }}>
-              <XCircle size={20} />
+            <button onClick={() => setChatOpen(false)} style={{ background: 'var(--border-color)', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', padding: '5px', borderRadius: '50%' }}>
+              <X size={20} />
             </button>
           </div>
           <Chat style={{ flex: 1, height: 'calc(100% - 50px)' }} />
@@ -736,11 +744,11 @@ function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isT
 
         {/* Participants Sidebar */}
         {participantsOpen && (
-          <div style={{ width: '320px', maxWidth: '100%', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+          <div style={{ width: '320px', maxWidth: '100vw', borderLeft: '1px solid var(--border-color)', background: 'var(--card-bg)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', boxShadow: '-5px 0 15px rgba(0,0,0,0.5)' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Participants ({participants.length})</span>
-              <button onClick={() => setParticipantsOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex' }}>
-                <XCircle size={20} />
+              <button onClick={() => setParticipantsOpen(false)} style={{ background: 'var(--border-color)', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', padding: '5px', borderRadius: '50%' }}>
+                <X size={20} />
               </button>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -968,11 +976,19 @@ export default function Room() {
   const [lastAutoJoinId, setLastAutoJoinId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id && joinState === 'form' && lastAutoJoinId !== id) {
+    if (id && lastAutoJoinId !== id) {
       setLastAutoJoinId(id);
-      joinMeeting(id);
+      // If they are in a different room, disconnect first
+      if (joinState === 'joined' || joinState === 'prejoin') {
+        setJoinState('form');
+        setToken('');
+      }
+      // Give state time to clear before auto-joining
+      setTimeout(() => {
+        joinMeeting(id);
+      }, 100);
     }
-  }, [id, joinState, lastAutoJoinId]);
+  }, [id, lastAutoJoinId, joinState]);
 
   const joinMeeting = async (targetRoom: string) => {
     if (!targetRoom.trim()) return;

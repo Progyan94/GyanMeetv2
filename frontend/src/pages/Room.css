@@ -61,8 +61,43 @@
   color: white !important;
 }
 .lk-control-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  z-index: 10;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   background-color: rgba(0,0,0,0.8) !important;
   border-top: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+.lk-control-bar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.panel-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-close-btn:hover {
+  background: var(--border-color);
 }
 
 .lk-chat-header {

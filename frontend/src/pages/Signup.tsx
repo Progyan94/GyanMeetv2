@@ -23,7 +23,13 @@ export default function Signup() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: fullName });
-      navigate('/');
+      const pending = localStorage.getItem('pendingDeepLink');
+      if (pending) {
+        localStorage.removeItem('pendingDeepLink');
+        navigate(pending);
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to create an account');
     } finally {

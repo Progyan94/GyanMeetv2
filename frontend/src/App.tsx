@@ -14,19 +14,22 @@ function DeepLinkListener() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const handlePath = (path: string) => {
+      if (path && path !== '/') {
+        if (!auth.currentUser) {
+          localStorage.setItem('pendingDeepLink', path);
+        }
+        navigate(path);
+      }
+    };
+
     // Listen for Android/iOS App Links
     const capListener = CapacitorApp.addListener('appUrlOpen', data => {
-      // E.g. https://gyanmeet.vercel.app/room/1234
       const url = new URL(data.url);
       if (url.hostname === 'gyanmeet.vercel.app') {
-        const path = url.pathname;
-        if (path) {
-          navigate(path);
-        }
+        handlePath(url.pathname);
       } else if (data.url.startsWith('gyanmeet://')) {
-        // Fallback for custom protocol
-        const path = data.url.replace('gyanmeet://', '/');
-        navigate(path);
+        handlePath(data.url.replace('gyanmeet://', '/').replace('//', '/'));
       }
     });
 
@@ -37,10 +40,7 @@ function DeepLinkListener() {
       listen('scheme-request-received', (event: any) => {
         const payload = event.payload; // "gyanmeet://room/1234"
         if (typeof payload === 'string' && payload.startsWith('gyanmeet://')) {
-          let path = payload.replace('gyanmeet://', '/');
-          // Fix double slashes if any
-          path = path.replace('//', '/');
-          navigate(path);
+          handlePath(payload.replace('gyanmeet://', '/').replace('//', '/'));
         }
       }).then(unlisten => {
         unlistenTauri = unlisten;

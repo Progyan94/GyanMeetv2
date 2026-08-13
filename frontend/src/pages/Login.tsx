@@ -17,7 +17,13 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
+      const pending = localStorage.getItem('pendingDeepLink');
+      if (pending) {
+        localStorage.removeItem('pendingDeepLink');
+        navigate(pending);
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to login');
     } finally {

@@ -3,8 +3,7 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.gyanmeet.app",
-    "sha256_cert_fingerprints": [
-      "PUT_YOUR_PRODUCTION_SHA256_FINGERPRINT_HERE"
-    ]
+    "sha256_cert_fingerprints":
+    ["9D:B2:8A:96:68:8E:5D:21:C3:48:3D:1E:54:73:95:3F:F2:3F:62:D6:C6:04:B2:D6:71:9A:76:C6:02:BA:38:F1"]
   }
 }]

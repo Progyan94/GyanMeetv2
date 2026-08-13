@@ -30,7 +30,7 @@ fn main() {
         let url_clone = url.clone();
         tauri::async_runtime::spawn(async move {
           // Wait for frontend to load
-          tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+          tokio::time::sleep(std::time::Duration::from_millis(3000)).await;
           handle.emit_all("scheme-request-received", url_clone).unwrap();
         });
       }

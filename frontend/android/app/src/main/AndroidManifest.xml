@@ -27,7 +27,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="gyan-meetv2.vercel.app" />
+                <data android:scheme="https" android:host="gyanmeet.vercel.app" />
                 <data android:scheme="gyanmeet" />
             </intent-filter>
 
