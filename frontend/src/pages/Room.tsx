@@ -321,22 +321,23 @@ function CustomControlBar({
   };
 
   const handleRename = async () => {
-    if (participants.length <= 1) {
-      alert("No other students in the room to rename.");
+    const participantNames = participants.filter(p => p !== localParticipant).map(p => p.name || p.identity).join(', ');
+    if (participantNames.length === 0) {
+      alert("No other participants in the room to rename.");
       return;
     }
-    let participantNames = participants.filter(p => p !== localParticipant).map(p => p.name || p.identity).join(', ');
-    const targetName = window.prompt(`Enter the current name of the student to rename.\nAvailable: ${participantNames}`);
+    
+    const targetName = window.prompt(`Enter the current name of the participant to rename.\nAvailable: ${participantNames}`);
     if (!targetName) return;
 
     const targetParticipant = participants.find(p => (p.name === targetName || p.identity === targetName) && p !== localParticipant);
     if (!targetParticipant) {
-      alert("Student not found.");
+      alert("Participant not found.");
       return;
     }
 
-    const newName = window.prompt(`Enter new name for ${targetName}:`);
-    if (!newName || newName.trim() === '') return;
+    const newName = window.prompt(`Enter the new name for ${targetName}:`);
+    if (!newName) return;
 
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://gyan-meetv2.vercel.app';
@@ -352,24 +353,25 @@ function CustomControlBar({
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      alert("Rename successful! (It may take a few seconds to reflect)");
+      alert(`Successfully renamed ${targetName} to ${newName}`);
     } catch (e: any) {
-      alert("Failed to rename: " + e.message);
+      alert("Rename failed: " + e.message);
     }
   };
 
   const handleRemove = async () => {
-    if (participants.length <= 1) {
-      alert("No other students in the room to remove.");
+    const participantNames = participants.filter(p => p !== localParticipant).map(p => p.name || p.identity).join(', ');
+    if (participantNames.length === 0) {
+      alert("No other participants in the room to remove.");
       return;
     }
-    let participantNames = participants.filter(p => p !== localParticipant).map(p => p.name || p.identity).join(', ');
-    const targetName = window.prompt(`Enter the name of the student to remove/kick.\nAvailable: ${participantNames}`);
+    
+    const targetName = window.prompt(`Enter the name of the participant to remove/kick.\nAvailable: ${participantNames}`);
     if (!targetName) return;
 
     const targetParticipant = participants.find(p => (p.name === targetName || p.identity === targetName) && p !== localParticipant);
     if (!targetParticipant) {
-      alert("Student not found.");
+      alert("Participant not found.");
       return;
     }
 
@@ -496,10 +498,10 @@ function CustomControlBar({
 
       {isTeacher && (
         <>
-          <button className="lk-button" title="Rename Student" onClick={handleRename} style={{ background: 'var(--text-sub)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button className="lk-button" title="Rename Participant" onClick={handleRename} style={{ background: 'var(--text-sub)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Edit2 size={20}/>
           </button>
-          <button className="lk-button" title="Remove Student" onClick={handleRemove} style={{ background: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button className="lk-button" title="Remove Participant" onClick={handleRemove} style={{ background: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <UserX size={20}/>
           </button>
           {recording ? (
@@ -683,7 +685,7 @@ function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl, antiChe
         </div>
       )}
 
-      {/* Student Distraction Warning */}
+      {/* Participant Distraction Warning */}
       {!isTeacher && showCheatWarning && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 100,
@@ -1017,7 +1019,7 @@ export default function Room() {
       navigate(`/room/${targetRoom}`, { replace: true });
     }
     
-    const participantName = user?.displayName || user?.email?.split('@')[0] || 'Student';
+    const participantName = user?.displayName || user?.email?.split('@')[0] || 'Participant';
 
     setLoading(true);
     setError('');
