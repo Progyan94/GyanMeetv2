@@ -11,9 +11,9 @@ MeetXD is a modern, cross-platform video conferencing platform. It supports real
 - **Anti-Cheat Tracking:** Hosts can optionally enable tracking to see if participants switch tabs or leave the meeting window.
 
 ## Support & Custom Builds
-MeetXD is an open-source labor of love. If you enjoy using it, the best way to support the development is to **Star the repository on GitHub**!
+MeetXD is an open-source labor of love. If you enjoy using it, consider supporting the development!
 
-⭐ **[Star MeetXD on GitHub](https://github.com/Progyan94/GyanMeetv2)**
+☕ **[Buy Me A Coffee](https://buymeacoffee.com/)** *(Replace with your actual link)*
 
 **Need a Custom Version?**
 If you want to use MeetXD for your school or business but don't know how to code, I offer paid setup services. I can:

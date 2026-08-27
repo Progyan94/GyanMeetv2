@@ -16,8 +16,8 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
           <p>
             &copy; {new Date().getFullYear()} MeetXD. Created by GyanXD. All rights reserved. 
             <br />
-            <a href="https://github.com/Progyan94/GyanMeetv2" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-saffron)', textDecoration: 'none', marginLeft: '5px' }}>
-              ⭐ Star this project on GitHub
+            <a href="https://buymeacoffee.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-saffron)', textDecoration: 'none', marginLeft: '5px' }}>
+              ☕ Support the Creator
             </a>
           </p>
           <button 
