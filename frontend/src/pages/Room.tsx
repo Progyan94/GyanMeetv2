@@ -560,7 +560,7 @@ function CustomParticipantTile(props: any) {
   );
 }
 
-function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isTeacher: boolean, initialBgMode?: 'none'|'blur'|'image', initialBgUrl?: string }) {
+function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl, antiCheatEnabled = false }: { isTeacher: boolean, initialBgMode?: 'none'|'blur'|'image', initialBgUrl?: string, antiCheatEnabled?: boolean }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [participantsOpen, setParticipantsOpen] = useState(false);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
@@ -622,7 +622,13 @@ function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isT
   }, [room]);
 
   useEffect(() => {
-    if (isTeacher || !localParticipant) return;
+    if (isTeacher || !localParticipant || !antiCheatEnabled) {
+      // Clear distraction status if disabled
+      if (localParticipant) {
+        localParticipant.setAttributes({ isDistracted: "false" });
+      }
+      return;
+    }
 
     const handleFocusLoss = () => {
       localParticipant.setAttributes({ isDistracted: "true" });
@@ -644,7 +650,7 @@ function CustomVideoConference({ isTeacher, initialBgMode, initialBgUrl }: { isT
       window.removeEventListener('focus', handleFocusGain);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isTeacher, localParticipant]);
+  }, [isTeacher, localParticipant, antiCheatEnabled]);
 
   const tracks = useTracks(
     [
@@ -786,11 +792,12 @@ function CustomPreJoin({
   onCancel 
 }: { 
   roomName: string;
-  onJoin: (opts: { cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string }) => void;
+  onJoin: (opts: { cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string, antiCheat: boolean }) => void;
   onCancel: () => void;
 }) {
   const [camEnabled, setCamEnabled] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
+  const [antiCheatEnabled, setAntiCheatEnabled] = useState(false);
   const [bgMode, setBgMode] = useState<'none'|'blur'|'image'>('none');
   const [bgUrl, setBgUrl] = useState<string | undefined>();
   const [videoTrack, setVideoTrack] = useState<LocalVideoTrack | null>(null);
@@ -924,16 +931,25 @@ function CustomPreJoin({
         <div style={{ flex: '0 0 250px', display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center' }}>
           <h2 style={{ margin: '0 0 10px 0' }}>Ready to join?</h2>
           <p style={{ margin: '0 0 20px 0', color: 'var(--text-sub)' }}>Room: <strong style={{color: 'var(--primary-saffron)'}}>{roomName}</strong></p>
+          
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+            <input type="checkbox" checked={antiCheatEnabled} onChange={(e) => setAntiCheatEnabled(e.target.checked)} style={{ marginTop: '3px' }} />
+            <div>
+              <span style={{ display: 'block', fontWeight: 'bold' }}>Enable Anti-Cheat Tracking</span>
+              <span style={{ color: 'var(--text-sub)', fontSize: '0.75rem', display: 'block' }}>Disclaimer: When enabled, the host can see if you switch tabs or leave the meeting window. Do not enable for public meetings.</span>
+            </div>
+          </label>
+
           <button 
             className="btn-primary" 
-            onClick={() => onJoin({ cam: camEnabled, mic: micEnabled, present: false, bgMode, bgUrl })}
+            onClick={() => onJoin({ cam: camEnabled, mic: micEnabled, present: false, bgMode, bgUrl, antiCheat: antiCheatEnabled })}
           >
             Join Now
           </button>
           <button 
             className="btn-primary" 
             style={{ background: 'transparent', border: '1px solid var(--primary-saffron)', color: 'var(--primary-saffron)' }}
-            onClick={() => onJoin({ cam: false, mic: false, present: true, bgMode: 'none' })}
+            onClick={() => onJoin({ cam: false, mic: false, present: true, bgMode: 'none', antiCheat: false })}
           >
             Companion Mode
           </button>
@@ -954,12 +970,12 @@ export default function Room() {
   const [error, setError] = useState('');
   
   const [joinState, setJoinState] = useState<'form' | 'prejoin' | 'joined'>('form');
-  const [joinOpts, setJoinOpts] = useState<{ cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string } | null>(null);
+  const [joinOpts, setJoinOpts] = useState<{ cam: boolean, mic: boolean, present: boolean, bgMode: 'none'|'blur'|'image', bgUrl?: string, antiCheat: boolean } | null>(null);
   
   const user = auth.currentUser;
   
-  // Make everyone a host by default for open source usage
-  const isHost = true;
+  // Host privileges are given to whoever created the room
+  const isHost = localStorage.getItem('host_' + (id || roomName)) === 'true';
   const isTeacher = isHost; // For backwards compatibility with the existing variable names
 
   // Auto-launch the app via hidden iframe if on web and joining via link
@@ -1040,7 +1056,8 @@ export default function Room() {
   };
 
   const handleCreateMeeting = () => {
-    const randomCode = "gyan-" + Math.floor(1000 + Math.random() * 9000);
+    const randomCode = "meetxd-" + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem('host_' + randomCode, 'true');
     setRoomName(randomCode);
     joinMeeting(randomCode);
   };
@@ -1181,6 +1198,7 @@ export default function Room() {
               isTeacher={isTeacher} 
               initialBgMode={joinOpts?.bgMode} 
               initialBgUrl={joinOpts?.bgUrl} 
+              antiCheatEnabled={joinOpts?.antiCheat}
             />
             <RoomAudioRenderer />
           </ErrorBoundary>
