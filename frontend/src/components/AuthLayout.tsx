@@ -13,7 +13,7 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
         </div>
         {children}
         <div className="auth-footer">
-          <p>&copy; {new Date().getFullYear()} MeetXD. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} MeetXD. Created by GyanXD. All rights reserved.</p>
           <button 
             onClick={() => window.location.reload()} 
             style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', textDecoration: 'underline' }}
