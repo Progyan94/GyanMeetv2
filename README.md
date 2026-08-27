@@ -10,6 +10,18 @@ MeetXD is a modern, cross-platform video conferencing platform. It supports real
 - **Host Controls:** The person who creates the room gets exclusive abilities to rename/remove participants and record the meeting.
 - **Anti-Cheat Tracking:** Hosts can optionally enable tracking to see if participants switch tabs or leave the meeting window.
 
+## Support & Custom Builds
+MeetXD is an open-source labor of love. If you enjoy using it, consider supporting the development!
+
+☕ **[Buy Me A Coffee](https://buymeacoffee.com/)** *(Replace with your actual link)*
+
+**Need a Custom Version?**
+If you want to use MeetXD for your school or business but don't know how to code, I offer paid setup services. I can:
+- Deploy a custom, branded version of MeetXD on your own servers.
+- Provide custom-compiled `.exe` (Windows Desktop) and `.apk` (Android Mobile) installers branded for your organization.
+
+Feel free to reach out to me (GyanXD) for consulting and custom builds!
+
 ## Copyright and Terms of Use
 **© 2026 MeetXD. Created by GyanXD.**
 

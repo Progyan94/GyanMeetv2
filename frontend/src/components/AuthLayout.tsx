@@ -13,7 +13,13 @@ export default function AuthLayout({ children, title, subtitle }: { children: Re
         </div>
         {children}
         <div className="auth-footer">
-          <p>&copy; {new Date().getFullYear()} MeetXD. Created by GyanXD. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} MeetXD. Created by GyanXD. All rights reserved. 
+            <br />
+            <a href="https://buymeacoffee.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-saffron)', textDecoration: 'none', marginLeft: '5px' }}>
+              ☕ Support the Creator
+            </a>
+          </p>
           <button 
             onClick={() => window.location.reload()} 
             style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', textDecoration: 'underline' }}
