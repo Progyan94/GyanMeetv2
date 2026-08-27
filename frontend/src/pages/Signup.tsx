@@ -38,7 +38,7 @@ export default function Signup() {
   };
 
   return (
-    <AuthLayout title="Join Gyan Classes" subtitle="Create your student account">
+    <AuthLayout title="Join MeetXD" subtitle="Create your account">
       <form className="auth-form" onSubmit={handleSignup}>
         {error && <div className="auth-error">{error}</div>}
         <div className="auth-form-group">
@@ -62,7 +62,7 @@ export default function Signup() {
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
-            placeholder="student@gyanclasses.com"
+            placeholder="user@example.com"
           />
         </div>
         <div className="auth-form-group">

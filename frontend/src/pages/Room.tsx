@@ -1161,7 +1161,7 @@ export default function Room() {
     <div className="room-container">
       <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10, display: 'flex', gap: '10px', alignItems: 'center' }}>
         <div style={{ color: 'var(--primary-saffron)', fontWeight: 'bold', fontSize: '1.2rem', padding: '5px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px' }}>
-          Gyan Classes
+          MeetXD
         </div>
         <div style={{ background: 'rgba(0,0,0,0.6)', padding: '5px 15px', borderRadius: '8px', fontSize: '1rem', display: 'flex', gap: '10px', alignItems: 'center', border: '1px solid var(--primary-saffron-light)' }}>
           <span style={{ color: '#ccc' }}>Class Code:</span>

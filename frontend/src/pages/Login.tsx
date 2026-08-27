@@ -32,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout title="Welcome Back" subtitle="Sign in to your Gyan Classes account">
+    <AuthLayout title="Welcome Back" subtitle="Sign in to your MeetXD account">
       <form className="auth-form" onSubmit={handleLogin}>
         {error && <div className="auth-error">{error}</div>}
         <div className="auth-form-group">
@@ -44,7 +44,7 @@ export default function Login() {
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
-            placeholder="student@gyanclasses.com"
+            placeholder="user@example.com"
           />
         </div>
         <div className="auth-form-group">
