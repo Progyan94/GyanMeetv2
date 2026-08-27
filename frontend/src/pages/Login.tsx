@@ -60,7 +60,7 @@ export default function Login() {
           />
         </div>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginBottom: '15px' }}>
-          By continuing, you agree to our Terms of Service and acknowledge that MeetXD is a project created by GyanXD.
+          By continuing, you agree to our <Link to="/terms" style={{ color: 'var(--primary-saffron)' }}>Terms of Service</Link> and acknowledge that MeetXD is a project created by GyanXD.
         </p>
         <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '0.5rem' }}>
           {loading ? 'Signing in...' : 'Sign In'}

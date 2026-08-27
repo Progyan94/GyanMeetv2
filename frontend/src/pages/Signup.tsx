@@ -90,7 +90,7 @@ export default function Signup() {
           />
         </div>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginBottom: '15px' }}>
-          By creating an account, you agree to our Terms of Service and acknowledge that MeetXD is a project created by GyanXD.
+          By creating an account, you agree to our <Link to="/terms" style={{ color: 'var(--primary-saffron)' }}>Terms of Service</Link> and acknowledge that MeetXD is a project created by GyanXD.
         </p>
         <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? 'Creating Account...' : 'Sign Up'}
