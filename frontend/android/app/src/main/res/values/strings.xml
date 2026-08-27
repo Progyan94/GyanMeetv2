@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">GyanMeet</string>
-    <string name="title_activity_main">GyanMeet</string>
-    <string name="package_name">com.gyanmeet.app</string>
-    <string name="custom_url_scheme">com.gyanmeet.app</string>
+    <string name="app_name">MeetXD</string>
+    <string name="title_activity_main">MeetXD</string>
+    <string name="package_name">com.MeetXD.app</string>
+    <string name="custom_url_scheme">com.MeetXD.app</string>
 </resources>

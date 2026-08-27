@@ -958,16 +958,16 @@ export default function Room() {
   
   const user = auth.currentUser;
   
-  // Use the requested email or fallback to environment variable
-  const TEACHER_EMAIL = import.meta.env.VITE_TEACHER_EMAIL || "gyanclassesabacus2014@gmail.com";
-  const isTeacher = user?.email === TEACHER_EMAIL;
+  // Make everyone a host by default for open source usage
+  const isHost = true;
+  const isTeacher = isHost; // For backwards compatibility with the existing variable names
 
   // Auto-launch the app via hidden iframe if on web and joining via link
   useEffect(() => {
     if (id && !(window as any).__TAURI__) {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
-      iframe.src = `gyanmeet://room/${id}`;
+      iframe.src = `meetxd://room/${id}`;
       document.body.appendChild(iframe);
       setTimeout(() => {
         if (document.body.contains(iframe)) {
@@ -1062,9 +1062,9 @@ export default function Room() {
         </div>
         <div className="card join-card">
           <div style={{ textAlign: 'center' }}>
-            <h2>{isTeacher ? "Teacher Dashboard" : "Join a Class"}</h2>
+            <h2>{isTeacher ? "MeetXD Dashboard" : "Join a Meeting"}</h2>
             <p style={{ color: 'var(--text-sub)' }}>
-              {isTeacher ? "Create a new meeting or join an existing one." : "Enter a class code provided by your teacher."}
+              {isTeacher ? "Create a new meeting or join an existing one." : "Enter a meeting code to join."}
             </p>
           </div>
 
@@ -1076,7 +1076,7 @@ export default function Room() {
                 disabled={loading}
                 style={{ width: '100%' }}
               >
-                {loading ? 'Starting...' : 'Start New Class (Create Meeting)'}
+                {loading ? 'Starting...' : 'Start New Meeting'}
               </button>
               <div style={{ textAlign: 'center', color: 'var(--text-sub)', fontSize: '0.875rem' }}>- OR -</div>
             </div>
@@ -1085,7 +1085,7 @@ export default function Room() {
           <form className="auth-form" onSubmit={handleJoinSubmit}>
             {error && <div className="auth-error">{error}</div>}
             <div className="auth-form-group">
-              <label htmlFor="roomName">Class Code</label>
+              <label htmlFor="roomName">Meeting Code</label>
               <input 
                 type="text" 
                 id="roomName" 
@@ -1093,11 +1093,11 @@ export default function Room() {
                 value={roomName} 
                 onChange={(e) => setRoomName(e.target.value)} 
                 required 
-                placeholder="e.g. gyan-1234"
+                placeholder="e.g. meet-1234"
               />
             </div>
             <button type="submit" className="btn-primary" disabled={loading} style={{ background: isTeacher ? 'var(--text-sub)' : 'var(--primary-saffron)' }}>
-              {loading ? 'Joining...' : 'Join Existing Class'}
+              {loading ? 'Joining...' : 'Join Existing Meeting'}
             </button>
             
             {roomName && !(window as any).__TAURI__ && (
@@ -1151,8 +1151,8 @@ export default function Room() {
           <span style={{ fontWeight: 'bold', letterSpacing: '1px', userSelect: 'all' }}>{roomName}</span>
           <button 
             onClick={() => {
-              navigator.clipboard.writeText(`https://gyanmeet.vercel.app/room/${roomName}`);
-              alert('Invite link copied to clipboard!');
+              navigator.clipboard.writeText(`https://meetxd.vercel.app/room/${roomName}`);
+              alert('Meeting link copied!');
             }}
             style={{ background: 'none', border: 'none', color: 'var(--primary-saffron)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 5px' }}
             title="Copy Invite Link"

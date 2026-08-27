@@ -51,15 +51,15 @@ jobs:
 
       - name: Rename APK
         working-directory: ./frontend/android/app/build/outputs/apk/debug
-        run: mv app-debug.apk gyanmeet.apk
+        run: mv app-debug.apk MeetXD.apk
 
       - name: Publish Direct APK Download
         uses: ncipollo/release-action@v1
         with:
           tag: "latest"
           name: "Latest Build"
-          body: "Automated direct download for the latest GyanMeet APK."
-          artifacts: "frontend/android/app/build/outputs/apk/debug/gyanmeet.apk"
+          body: "Automated direct download for the latest MeetXD APK."
+          artifacts: "frontend/android/app/build/outputs/apk/debug/MeetXD.apk"
           allowUpdates: true
           makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}

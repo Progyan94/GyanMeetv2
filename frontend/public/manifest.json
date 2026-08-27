@@ -1,12 +1,12 @@
 {
   "background_color": "#ff4b00",
-  "description": "GyanMeet",
+  "description": "MeetXD",
   "dir": "ltr",
   "display": "standalone",
-  "name": "GyanMeet",
+  "name": "MeetXD",
   "orientation": "portrait-primary",
   "scope": "/",
-  "short_name": "GyanMeet",
+  "short_name": "MeetXD",
   "start_url": "/",
   "theme_color": "#00ff9c",
   "icons": [

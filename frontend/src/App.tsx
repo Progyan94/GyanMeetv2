@@ -26,10 +26,10 @@ function DeepLinkListener() {
     // Listen for Android/iOS App Links
     const capListener = CapacitorApp.addListener('appUrlOpen', data => {
       const url = new URL(data.url);
-      if (url.hostname === 'gyanmeet.vercel.app') {
+      if (url.hostname === 'meetxd.vercel.app') {
         handlePath(url.pathname);
-      } else if (data.url.startsWith('gyanmeet://')) {
-        handlePath(data.url.replace('gyanmeet://', '/').replace('//', '/'));
+      } else if (data.url.startsWith('meetxd://')) {
+        handlePath(data.url.replace('meetxd://', '/').replace('//', '/'));
       }
     });
 
@@ -38,9 +38,9 @@ function DeepLinkListener() {
     // Check if running inside Tauri
     if ((window as any).__TAURI__) {
       listen('scheme-request-received', (event: any) => {
-        const payload = event.payload; // "gyanmeet://room/1234"
-        if (typeof payload === 'string' && payload.startsWith('gyanmeet://')) {
-          handlePath(payload.replace('gyanmeet://', '/').replace('//', '/'));
+        const payload = event.payload; // "meetxd://room/1234"
+        if (typeof payload === 'string' && payload.startsWith('meetxd://')) {
+          handlePath(payload.replace('meetxd://', '/').replace('//', '/'));
         }
       }).then(unlisten => {
         unlistenTauri = unlisten;

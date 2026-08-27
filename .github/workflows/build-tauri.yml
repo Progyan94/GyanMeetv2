@@ -42,8 +42,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: ./frontend
-          tagName: GyanMeet-v1.0.${{ github.run_number }}
-          releaseName: "GyanMeet Windows Installer (v1.0.${{ github.run_number }})"
-          releaseBody: "Download the attached .exe or .msi file to install GyanMeet on your Windows PC!"
+          tagName: MeetXD-v1.0.${{ github.run_number }}
+          releaseName: "MeetXD Windows Installer (v1.0.${{ github.run_number }})"
+          releaseBody: "Download the attached .exe or .msi file to install MeetXD on your Windows PC!"
           releaseDraft: false
           prerelease: false

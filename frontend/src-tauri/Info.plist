@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
   <key>NSCameraUsageDescription</key>
-  <string>GyanMeet requires access to your camera for video conferencing.</string>
+  <string>MeetXD requires access to your camera for video conferencing.</string>
   <key>NSMicrophoneUsageDescription</key>
-  <string>GyanMeet requires access to your microphone for audio conferencing.</string>
+  <string>MeetXD requires access to your microphone for audio conferencing.</string>
 </dict>
 </plist>
