@@ -11,7 +11,7 @@ MeetXD is a modern, cross-platform video conferencing platform. It supports real
 - **Anti-Cheat Tracking:** Hosts can optionally enable tracking to see if participants switch tabs or leave the meeting window.
 
 ## Copyright and Terms of Use
-**© 2026 MeetXD. Created by GyanXD.**
+**Â© 2026 MeetXD. Created by GyanXD.**
 
 This project is open-source. You are free to download, modify, and use this codebase to create your own video conferencing applications. 
 
@@ -22,3 +22,6 @@ If you use this code (or a substantial portion of it) to create your own project
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. The original copyright notice and attribution must be included in all copies or substantial portions of the software.
+
+### Commercial Licensing
+If you would like to use this software without the attribution requirement, or need a custom license for enterprise/commercial use, please contact GyanXD to request a commercial license.

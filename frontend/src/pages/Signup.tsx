@@ -86,11 +86,14 @@ export default function Signup() {
             value={confirmPassword} 
             onChange={(e) => setConfirmPassword(e.target.value)} 
             required 
-            placeholder="••••••••"
+            placeholder="Enter a strong password"
           />
         </div>
-        <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '0.5rem' }}>
-          {loading ? 'Signing up...' : 'Sign Up'}
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-sub)', textAlign: 'center', marginBottom: '15px' }}>
+          By creating an account, you agree to our Terms of Service and acknowledge that MeetXD is a project created by GyanXD.
+        </p>
+        <button type="submit" className="btn-primary" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
       <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem' }}>
